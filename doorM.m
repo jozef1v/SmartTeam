@@ -1,4 +1,6 @@
 
+% email 1x
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % doorM
@@ -18,7 +20,7 @@ function [door_val,skip,optionsN] = doorM(hum_off,fan_off,options)
 options.RequestMethod = 'auto';
 try
     door = webread(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
-        'sensor',"}/properties/{",type('door'),"}"),options);
+        device('sensor'),"}/properties/{",d_type('door'),"}"),options);
 catch
     options = errors('door');
 end
@@ -32,7 +34,7 @@ if door_val == 1
     propertyValue = struct('value', 0);
     try
         webwrite(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
-            'actuator',"}/properties/{",type('heating'),"}/publish"), ...
+            device('actuator'),"}/properties/{",d_type('heating'),"}/publish"), ...
             propertyValue,options);
     catch
         options = errors('heating');
@@ -43,7 +45,7 @@ if door_val == 1
     propertyValue_h = struct('value',hum_off);
     try
         webwrite(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
-            'actuator',"}/properties/{",type('pump'),"}/publish"), ...
+            device('actuator'),"}/properties/{",d_type('pump'),"}/publish"), ...
             propertyValue_h,options);
     catch
         options = errors('pump');
@@ -54,7 +56,7 @@ if door_val == 1
     propertyValue = struct('value',fan_off);
     try
         webwrite(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
-            'actuator',"}/properties/{",type('fan'),"}/publish"), ...
+            device('actuator'),"}/properties/{",d_type('fan'),"}/publish"), ...
             propertyValue,options);
     catch
         options = errors('fan');

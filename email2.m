@@ -19,7 +19,7 @@ function email2(id)
         - destination   - recipient's email
 %}
 source = 'Vesna.STU.2021@gmail.com';
-destination = 'peter.bakarac@stuba.sk';
+destination = 'dodoodod1221@gmail.com';
 password = 'Sklenik2022';
 
 % Set up Gmail SMTP

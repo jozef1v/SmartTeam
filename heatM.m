@@ -21,7 +21,7 @@ function [T_avg,t_act,u_pN,e_pN,optionsN] = heatM(t_h,time_up,time_down, ...
 options.RequestMethod = 'auto';
 try
     t_top = webread(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
-        'sensor',"}/properties/{",type('tempT'),"}"),options);
+        device('sensor'),"}/properties/{",d_type('tempT'),"}"),options);
 catch
     options = errors('tempT');
 end
@@ -31,7 +31,7 @@ T_top = t_top.last_value;
 options.RequestMethod = 'auto';
 try
     t_bot = webread(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
-        'sensor',"}/properties/{",type('tempB'),"}"),options);
+        device('sensor'),"}/properties/{",d_type('tempB'),"}"),options);
 catch
     options = errors('tempB');
 end
@@ -51,7 +51,7 @@ end
 e =  w-T_avg;
 
 % Control output
-u = PID(e,e_p,u_p);
+u = PID_con(e,e_p,u_p);
 
 % Control output saturation
 if u > 255
@@ -69,7 +69,7 @@ options.RequestMethod = 'put';
 propertyValue = struct('value',u);
 try
     webwrite(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
-            'actuator',"}/properties/{",type('heating'),"}/publish"), ...
+            device('actuator'),"}/properties/{",d_type('heating'),"}/publish"), ...
             propertyValue,options);
 catch
     options = errors('heating');

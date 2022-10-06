@@ -19,7 +19,7 @@ function [light_val,light_act,optionsN] = lightM(t_h,time_up,time_down, ...
 options.RequestMethod = 'auto';
 try
     light = webread(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
-        'actuator',"}/properties/{",type('light'),"}"),options);
+        device('sensor'),"}/properties/{",d_type('light'),"}"),options);
 catch
     options = errors('light');
 end
@@ -41,7 +41,7 @@ options.RequestMethod = 'put';
 try
     light_act = propertyValue.value;
     webwrite(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
-        'actuator',"}/properties/{",type('lighting'),"}/publish"), ...
+        device('actuator'),"}/properties/{",d_type('lighting'),"}/publish"), ...
         propertyValue,options);
 catch
     options = errors('lighting');

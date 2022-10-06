@@ -17,7 +17,7 @@ function optionsN = anomalies(T_avg,t_max,fan_act,fan_on,fan_off,count, ...
 %% FAN CONTROL ANOMALIES
 
 % Internal temperature of Vesna is increased, the fan does not respond.
-if T_avg >= t_max && fan_act == fan_off
+if T_avg >= t_max && fan_act == fan_off && count < 120
     try
         email2('fan1');
     catch
@@ -25,7 +25,7 @@ if T_avg >= t_max && fan_act == fan_off
     end
 end
 % Internal temperature of Vesna is normal, the fan does respond.
-if T_avg < t_max && fan_act == fan_on
+if T_avg < t_max && fan_act == fan_on && count < 120
     try
         email2('fan2');
     catch
@@ -44,7 +44,7 @@ end
 %% PUMP CONTROL ANOMALIES
 
 % Internal humidity of Vesna is increased, the pump does respond.
-if HUM_avg >= h_max && hum_act == hum_on
+if HUM_avg >= h_max && hum_act == hum_on && count < 120
     try
         email2('pump1');
     catch
@@ -52,7 +52,7 @@ if HUM_avg >= h_max && hum_act == hum_on
     end
 end
 % Internal humidity of Vesna is decreased, the pump does not respond.
-if HUM_avg <= h_min && hum_act == hum_off
+if HUM_avg <= h_min && hum_act == hum_off && count < 120
     try
         email2('pump2');
     catch

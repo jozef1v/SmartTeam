@@ -1,7 +1,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% type
+% d_type
 %
 % File for assigning the purpose of use of the device. The M-file consists
 % of an external function that provides the 'PID' access key of the device
@@ -9,7 +9,7 @@
 % contains the identifier of the device in question.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function PID = type(pid)
+function PID = d_type(pid)
 
 % Sensors PID
 keySet = {'light', ...
@@ -51,9 +51,9 @@ valueSet = {'d6653286-1d51-49d0-83b9-0dd6bf6b54fe'; % Light
         'f3fc0564-a623-43d7-a288-fc17a4f25dce';     % Pump
         'a9f0e988-ad3d-4d77-b0aa-a82abfc70c58';     % Heating
         '128d9d60-0c2f-4a58-a3e4-fb833e10bf81'};    % Lightning
-type = containers.Map(keySet,valueSet);
+type_d = containers.Map(keySet,valueSet);
 
-PID = type(pid);
+PID = type_d(pid);
 
 end
 

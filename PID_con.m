@@ -1,9 +1,9 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% PID
+% PID_con
 %
-% PID temperature controller of the Vesna greenhouse. M-file containing
+% PID_con temperature controller of the Vesna greenhouse. M-file containing
 % the external function contains the values of the current 'e' and
 % the previous 'e_p' control error, as well as the previous value of
 % the control output 'u_p' as an input argument. The output from this
@@ -11,7 +11,7 @@
 % sampling period.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function u = PID(e,e_p,u_p)
+function u = PID_con(e,e_p,u_p)
 
     % Controller constants
     Z_r = 45;
@@ -21,4 +21,8 @@ function u = PID(e,e_p,u_p)
     % Control output
     u_d = Z_r*(e-e_p)+ Z_r/T_i*T_s*e;
     u = u_p+u_d;
+
+% u(k) = (Kp + Ki*Δt + Kd/Δt) * e(k) - (Kp + 2*Kp/Δt) * e(k-1) +
+%             + Kd/Δt * e(k-2) + u(k-1)
+
 end

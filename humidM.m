@@ -18,7 +18,7 @@ function [HUM_avg,pump_act,optionsN] = humidM(h_max,h_min,hum_on, ...
 options.RequestMethod = 'auto';
 try
     hum_bme = webread(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
-        'sensor',"}/properties/{",type('bmmeH'),"}"),options);
+        device('sensor'),"}/properties/{",d_type('bmmeH'),"}"),options);
 catch
     options = errors('bmmeH');
 end
@@ -28,7 +28,7 @@ HUM_bme = hum_bme.last_value;
 options.RequestMethod = 'auto';
 try
     hum_dht = webread(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
-        'sensor',"}/properties/{",type('dhtH'),"}"),options);
+        device('sensor'),"}/properties/{",d_type('dhtH'),"}"),options);
 catch
     options = errors('dhtH');
 end
@@ -49,7 +49,7 @@ options.RequestMethod = 'put';
 try
     pump_act = propertyValue.value;
     webwrite(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
-        'actuator',"}/properties/{",type('pump'),"}/publish"), ...
+        device('actuator'),"}/properties/{",d_type('pump'),"}/publish"), ...
         propertyValue,options);
 catch
     options = errors('pump');
