@@ -41,13 +41,20 @@ url = "https://api2.arduino.cc/iot/v1/clients/token";
 headerFields = {'Content-type','application/x-www-form-urlencoded';'charset','UTF-8'};
 options = weboptions('HeaderFields', headerFields);
 
+% Initialize counter 'spec'
+spec = 0;
+
 % Arduino Cloud connection response
-try
-    response = webwrite(url,'client_id', client_id,'client_secret', ...
-        client_secret,'grant_type','client_credentials','audience', ...
-        'https://api2.arduino.cc/iot',options);
-catch
-    errors('connect');
+while(true)
+    try
+        response = webwrite(url,'client_id', client_id,'client_secret', ...
+            client_secret,'grant_type','client_credentials','audience', ...
+            'https://api2.arduino.cc/iot',options);
+        break
+    catch
+        spec = spec + 1;
+        errors('connect',spec);
+    end
 end
 
 % Response access token
