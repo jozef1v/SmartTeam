@@ -66,10 +66,24 @@ valueSet2 = {'Vesna door was detected as open. For the sake of the quality of th
 subj = containers.Map(keySet,valueSet1);
 msg = containers.Map(keySet,valueSet2);
 
+% Initialize counter 'spec'
+spec = 0;
+
 % Send email
-try
-    sendmail(destination,subj(id),msg(id));
-    fprintf('Anomaly notification email was sent to your mail address.\n\n')
-catch
-    errors('email');
+while(true)
+    try
+        sendmail(destination,subj(id),msg(id));
+        fprintf('Anomaly notification email was sent to your mail address.\n\n')
+        break
+    catch
+        
+        % Terminates after 5 attempts
+        if spec> 5
+            break
+        end
+        spec = spec + 1;
+        errors('email',0);
+    end
+end
+
 end

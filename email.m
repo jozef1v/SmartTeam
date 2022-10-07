@@ -75,10 +75,22 @@ valueSet2 = {'Connection to Arduino Cloud failed - no server response. New conne
 subj = containers.Map(keySet,valueSet1);
 msg = containers.Map(keySet,valueSet2);
 
-% Send email
-try
-    sendmail(destination,subj(id),msg(id));
-    fprintf('Error notification email was sent to your mail address.\n\n')
-catch
-    errors('email');
+% Initialize counter 'spec'
+spec = 0;
+
+% Send notification email
+while(true)
+    try
+        sendmail(destination,subj(id),msg(id));
+        fprintf('Error notification email was sent to your mail address.\n\n')
+        break
+    catch
+
+        % Terminates after 5 attempts
+        if spec> 5
+            break
+        end
+        spec = spec + 1;
+        errors('email',0);
+    end
 end
