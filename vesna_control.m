@@ -1,11 +1,6 @@
 %==========================================================================
 %{
     NAVRHY
-
-    - dorobenie servisneho rezimu - ak padne connection/wifi pripojenie
-    pocas riadenia, pripadne prud, nech vypne vsetky pristroje (skusim sa
-    Peta spytat, ci by sa tam nedalo nainstalovat nejake cervene svetielko
-    na baterku, ktore by pocas toho blikalo)
     - vsetky udaje sa budu musiet nacitavat z Cloudu
         - nacitanie bude musiet byt robene v kazdom cykle
         - App Team tam bude posielat z webstranky po prihlaseni admina
@@ -58,39 +53,10 @@
 
 %% Initialization
 
-% Connect to Arduino Cloud
-options = reconnect;
-
-% Daytime mode
-time_down = 6;          % Day start
-time_up = 20;           % Day end
-
-% Lighting
-light_on = 255;         % Light is on
-light_off = 0;          % Light is off
-light_int = 1500;       % Min. light intensity
-
-% Temperature
-t_max = 31;             % Max. admissible temperature
-w_day = 29;             % Daytime temperature setpoint
-w_night = 26.5;         % Nighttime temperature setpoint
-
-% Fan
-fan_off = 0;            % Fan is on
-fan_on = 255;           % Fan is off
-
-% Humidity
-h_max = 42;             % Min. humidity
-h_min = 38;             % Max. humidity
-hum_off = 0;            % Pump is on
-hum_on = 255;           % Pump is off
-
-% Ventilation cycle counter & control period
+% Ventilation cycle counter
 count = 0;
-sampling = 60;
 
-% Initialization of control error e(k-1) and control output e(k-1)
-% at previous sample
+% Control error e(k-1) and control output e(k-1) at previous sample
 e_p = 0;
 u_p = 0;
 
@@ -100,50 +66,54 @@ while(true)
 % Current time
 t_h = datetime('now').Hour;
 
+% Load data from Arduino API Cloud
+[time_up,time_down,light_on,light_off,light_int,t_max,w_day,w_night, ...
+    fan_on,fan_off,h_max,h_min,hum_on,hum_off,samp,door_val,light_val, ...
+    T_top,T_bot,hum_bme,hum_dht] = load_data;
+
 %% Door management
 
 % Door position control function
-[door_val,skip,options] = doorM(hum_off,fan_off,options);
+skip = doorM(door_val);
 
 % Skips control loop
-if skip == 1
+if skip
     continue
 end
 
 %% Light management
 
 % Light intensity control function
-[light_val,light_act,options] = lightM(t_h,time_up,time_down,light_int, ...
-                                        light_on,light_off,options);
+light_S = lightM(light_val,time_up,time_down,light_int,light_on, ...
+                light_off,t_h);
 
 %% Temperature management
 
 % Temperature heating control function
-[t_val,t_act,u_p,e_p,options] = heatM(t_h,time_up,time_down,w_day, ...
-                                      w_night,e_p,u_p,options);
+[t_val,u_p,e_p] = heatM(T_top,T_bot,time_up,time_down,w_day,w_night, ...
+                        e_p,u_p,t_h);
 
 %% Humidity management
 
 % Humidity control function
-[HUM_avg,hum_act,options] = humidM(h_max,h_min,hum_on,hum_off,options);
+[hum_val,hum_S] = humidM(hum_bme,hum_dht,h_max,h_min,hum_on,hum_off);
 
 %% Fan management
 
 % Fan control function
-[fan_act,count,options] = fanM(t_val,t_max,fan_on,fan_off,count,options);
+[fan_S,count] = fanM(t_val,t_max,fan_on,fan_off,count);
 
 %% Control anomalies
 
 % Anomalies detection function
-options = anomalies(t_val,t_max,fan_act,fan_on,fan_off,count, ...
-                    HUM_avg,h_max,h_min,hum_act,hum_on,hum_off, ...
-                    t_h,time_up,time_down,intensity_of_light,light_int, ...
-                    light_act, light_on,light_off,options);
+anomalies(t_val,t_max,fan_S,fan_on,fan_off,count,hum_val,h_max,h_min, ...
+    hum_S,hum_on,hum_off,t_h,time_up,time_down,light_val,light_int, ...
+    light_S,light_on,light_off);
 
 %% Loop settings
 
 % Sampling period time
-pause(sampling)
+pause(samp)
 
 % Number of sampling periods
 count = count + 1;
