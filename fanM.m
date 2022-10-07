@@ -11,8 +11,7 @@
 % reduction and ventilation. The system control is two-position (on/off).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [fan_act,countN,optionsN] = fanM(T_avg,t_max,fan_on,fan_off, ...
-                                          count,options)
+function [fan_S,countN] = fanM(T_avg,t_max,fan_on,fan_off,count)
 
 % Set fan control (on/off)
 if T_avg >= t_max
@@ -27,20 +26,9 @@ if count >= 120
         count = 0;
     end
 end
+fan_S = propertyValue;
 
-% Send fan control data
-options.RequestMethod = 'put';
-try
-    fan_act = propertyValue.value;
-    webwrite(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
-        device('actuator'),"}/properties/{",d_type('fan'),"}/publish"), ...
-        propertyValue,options);
-catch
-    options = errors('fan');
-end
-
-% Rewrite options and count
-optionsN = options;
+% Rewrite count
 countN = count;
 
 end
