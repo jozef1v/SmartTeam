@@ -26,7 +26,7 @@ if door_val
     try
         email2('door');
     catch
-        errors('email');
+        1;
     end
 
     % Skip control loop

@@ -53,7 +53,9 @@ while(true)
         break
     catch
         spec = spec + 1;
-        errors('connect',spec);
+        if ~mod(spec,5)
+            errors('connect',spec);
+        end
     end
 end
 

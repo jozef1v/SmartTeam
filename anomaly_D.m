@@ -7,7 +7,7 @@ while(true)
         email2(id);
         break
     catch
-        errors('email',0);
+        1;
     end
 end
 
