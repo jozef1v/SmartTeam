@@ -12,6 +12,15 @@
     - prerobit PID regulator do tvaru diskretneho riadenia
     u(k) = (Kp + Ki*Δt + Kd/Δt) * e(k) - (Kp + 2*Kp/Δt) * e(k-1) +
             + Kd/Δt * e(k-2) + u(k-1)
+    - vyriesit problem s casovou dlzkou riadiaceho cyklu
+        - ak je rieseny v zmysle
+            ↱ nacitaju sa data → spracuju sa data
+             caka sa 60 sekund ← poslu sa data ↲
+        - problem je iba s tou datovou castou, kedze jej casova dlzka nie
+        je rovnaka (a ak bude vacsia ako sampling period, ako sa vyriesi?)
+    - errory sa nemozu vypisovat do nekonecna
+        - okrem zasielania emailu (o ktore sa pokusi iba 5krat, potom na to
+        kasle)
 %}
 
 %{
