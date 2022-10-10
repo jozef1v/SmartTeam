@@ -12,27 +12,11 @@
 function email(id)
 
 %{
-    Gmail credentials
+    Outlook credentials
     - requires:
-        - source        - sender's email
-        - password      - sender's password
-        - destination   - recipient's email
+        - destination   - recipient's outlook email
 %}
-source = 'Vesna.STU.2021@gmail.com';
-destination = 'dodoodod1221@gmail.com';
-password = 'Sklenik2022';
-
-% Set up Gmail SMTP
-setpref('Internet','E_mail',source);
-setpref('Internet','SMTP_Server','smtp.gmail.com');
-setpref('Internet','SMTP_Username',source);
-setpref('Internet','SMTP_Password',password);
-
-% Gmail server
-props = java.lang.System.getProperties;
-props.setProperty('mail.smtp.auth','true');
-props.setProperty('mail.smtp.socketFactory.class', 'javax.net.ssl.SSLSocketFactory');
-props.setProperty('mail.smtp.socketFactory.port','465');
+destination = 'jozefvargan1234@outlook.com';
 
 % Message description
 keySet = {'connect', ...
@@ -78,14 +62,34 @@ msg = containers.Map(keySet,valueSet2);
 % Send notification email
 for spec = 1:5
     try
-        sendmail(destination,subj(id),msg(id));
-        fprintf('Error notification email was sent to your mail address.\n\n')
+        sendolmail(destination,subj(id),msg(id));
+        fprintf(strcat('Error notification email was sent to your mail address (',string(datetime('now')),'.\n\n'))
         break
     catch
+        pause(3)
         % Terminates after 5 attempts
         if spec == 5
             errors('email',spec);
             break
         end
     end
+end
+
+end
+
+% Create email function
+function sendolmail(to,subject,body)
+
+% Create object and set parameters using MS Outlook
+h = actxserver('outlook.Application');
+mail = h.CreateItem('olMail');
+mail.Subject = subject;
+mail.To = to;
+mail.BodyFormat = 'olFormatHTML';
+mail.HTMLBody = body;
+
+% Send message and release object
+mail.Send;
+h.release;
+
 end
