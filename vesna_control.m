@@ -1,3 +1,22 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% vesna_control
+%
+% Vesna intelligent greenhouse control script. The M-file provides
+% comprehensive management of several measured variables of the system,
+% including diagnostics of problems, detection of emerging anomalies,
+% or providing support to the user.
+% 
+% Variables control in the code is decentralized. Each controlled variable
+% (temperature, humidity, lighting), including door position detection and
+% greenhouse ventilation, is based on external functions, creating
+% individual control sections of Vesna. They download (measured) data from
+% the Arduino Cloud, where the values of control output are subsequently
+% sent. In the event of a malfunction, the user is informed by e-mail.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %==========================================================================
 %{
     NAVRHY
@@ -21,6 +40,8 @@
     - errory sa nemozu vypisovat do nekonecna
         - okrem zasielania emailu (o ktore sa pokusi iba 5krat, potom na to
         kasle)
+    - opýtať sa na Gmail
+    - zapisovanie časov na Cloud
 %}
 
 %{
@@ -43,23 +64,6 @@
 %}
 %==========================================================================
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% vesna_control
-%
-% Vesna intelligent greenhouse control script. The M-file provides
-% comprehensive management of several measured variables of the system,
-% including diagnostics of problems, detection of emerging anomalies,
-% or providing support to the user.
-% 
-% Variables control in the code is decentralized. Each controlled variable
-% (temperature, humidity, lighting), including door position detection and
-% greenhouse ventilation, is based on external functions, creating
-% individual control sections of Vesna. They download (measured) data from
-% the Arduino Cloud, where the values of control output are subsequently
-% sent. In the event of a malfunction, the user is informed by e-mail.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 %% Initialization
 
 % Ventilation cycle counter
@@ -72,10 +76,13 @@ u_p = 0;
 %% Control loop
 while(true)
 
+% Start script run-time
+time1 = tic;
+
 % Current time
 t_h = datetime('now').Hour;
 
-% Load data from Arduino API Cloud
+%% Load data from Arduino API Cloud
 [time_up,time_down,light_on,light_off,light_int,t_max,w_day,w_night, ...
     fan_on,fan_off,h_max,h_min,hum_on,hum_off,samp,door_val,light_val, ...
     T_top,T_bot,hum_bme,hum_dht] = load_data;
@@ -99,8 +106,8 @@ light_S = lightM(light_val,time_up,time_down,light_int,light_on, ...
 %% Temperature management
 
 % Temperature heating control function
-[t_val,u_p,e_p] = heatM(T_top,T_bot,time_up,time_down,w_day,w_night, ...
-                        e_p,u_p,t_h);
+[temp_S,t_val,u_p,e_p] = heatM(T_top,T_bot,time_up,time_down,w_day, ...
+                            w_night,e_p,u_p,t_h);
 
 %% Humidity management
 
@@ -112,6 +119,9 @@ light_S = lightM(light_val,time_up,time_down,light_int,light_on, ...
 % Fan control function
 [fan_S,count] = fanM(t_val,t_max,fan_on,fan_off,count);
 
+%% Load data to Arduino API Cloud
+send_data(light_S,hum_off,fan_off,temp_S,hum_S,fan_S,door_val);
+
 %% Control anomalies
 
 % Anomalies detection function
@@ -120,6 +130,14 @@ anomalies(t_val,t_max,fan_S,fan_on,fan_off,count,hum_val,h_max,h_min, ...
     light_S,light_on,light_off);
 
 %% Loop settings
+
+% Check script run-time
+time2 = toc(time1);
+if time2 > samp
+    samp = samp - mod(time2,samp);
+else
+    samp = samp - time2;
+end
 
 % Sampling period time
 pause(samp)
