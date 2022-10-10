@@ -13,7 +13,7 @@
 % the control outputs 'u_p'.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [t_val,u_pN,e_pN] = heatM(T_top,T_bot,time_up,time_down, ...
+function [temp_S,t_val,u_pN,e_pN] = heatM(T_top,T_bot,time_up,time_down, ...
                                     w_day,w_night,e_p,u_p,t_h)
 
 % Average temperature
