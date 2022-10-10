@@ -21,6 +21,8 @@ if hum_val >= h_max
    propertyValue = struct('value',hum_off);
 elseif hum_val <= h_min
    propertyValue = struct('value',hum_on);
+else
+   propertyValue = struct('value',hum_off);
 end
 hum_S = propertyValue;
 
