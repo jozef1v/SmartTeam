@@ -1,12 +1,23 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% d_type
+% D_TYPE
 %
-% File for assigning the purpose of use of the device. The M-file consists
-% of an external function that provides the 'PID' access key of the device
-% being used as an output. It requires an input parameter 'pid' which
-% contains the identifier of the device in question.
+% File for the assigning of the respective device in use. M-file consists
+% of a function that provides the 'PID' access key of the specific device
+% being used as an output parameter. It requires an input parameter 'pid'
+% which represents the identifier of the device in question.
+%
+% List of input variables
+%   pid           - identifier of the used device.
+%
+% List of output variables
+%   PID           - Arduino API Cloud pid identificator for the used
+%                   device.
+%
+% List of local variables
+%   type_d        - types of the different used devices.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function PID = d_type(pid)

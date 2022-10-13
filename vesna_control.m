@@ -1,68 +1,122 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% vesna_control
+% VESNA_CONTROL
 %
-% Vesna intelligent greenhouse control script. The M-file provides
+% Vesna intelligent greenhouse control script. M-file provides
 % comprehensive management of several measured variables of the system,
 % including diagnostics of problems, detection of emerging anomalies,
 % or providing support to the user.
-% 
+%
 % Variables control in the code is decentralized. Each controlled variable
 % (temperature, humidity, lighting), including door position detection and
 % greenhouse ventilation, is based on external functions, creating
 % individual control sections of Vesna. They download (measured) data from
-% the Arduino Cloud, where the values of control output are subsequently
-% sent. In the event of a malfunction, the user is informed by e-mail.
+% the Arduino API Cloud, where the values of control output are
+% subsequently sent. In the event of a malfunction, the user is informed by
+% e-mail, while programm tries to solve the emerged problem.
+%
+% List of used functions
+%   load_data         - load data from Arduino API Cloud - control inputs,
+%                       control outputs, setpoints, limits...
+%   doorM             - detect the opening of the door - sends a command
+%                       to turn off Vesna.
+%   lightM            - check whether sufficient lighting of the greenhouse
+%                       is ensured depending on the day/night mode.
+%   heatM             - temperature control in the greenhouse using a PID
+%                       controller.
+%   humidM            - humidity control in the greenhouse using an on/off
+%                       controller.
+%   fanM              - temperature & ventilation control in the greenhouse
+%                       using an on/off controller.
+%   send_data         - send data to Arduino API Cloud - control inputs,
+%                       door position.
+%   anomalies         - detect the emergence of an unexpected situation -
+%                       anomaly & inform the user.
+%
+% List of used variables
+%   control script
+%       count         - iteration cycle number. Used in function/s fanM.m,
+%                       anomalies.m.
+%       e_p           - initialization of control error. Used in function/s
+%                       heatM.m.
+%       u_p           - initialization of control input. Used in function/s
+%                       heatM.m.
+%       t_h           - current time hour. Used in function/s lightM.m,
+%                       heatM.m, anomalies.m.
+%       time1         - initialization of elapsed time.
+%       time2         - ETL elapsed time in script operation mode.
+%   load_data
+%       time_up       - time to switch off daylight lighting and switch to
+%                       night temperature control. Used in function/s
+%                       lightM.m, heatM.m, anomalies.m.
+%       time_down     - time to switch on daylight lighting and switch to
+%                       day temperature control. Used in function/s
+%                       lightM.m, heatM.m, anomalies.m.
+%       light_on      - turn on the light. Used in function/s lightM.m,
+%                       anomalies.m.
+%       light_off     - turn off the light. Used in function/s lightM.m,
+%                       anomalies.m.
+%       light_int     - minimum permitted light intensity. Used in
+%                       function/s lightM.m, anomalies.m.
+%       t_max         - maximum permitted temperature in the greenhouse
+%                       (regulated by a fan). Used in function/s fanM.m,
+%                       anomalies.m.
+%       w_day         - daytime temperature setpoint. Timed by 'time_down'
+%                       & 'time_up'. Used in function/s heatM.m.
+%       w_night       - night-time temperature setpoint. Timed by 'time_up'
+%                       & 'time_down'. Used in function/s heatM.m.
+%       fan_on        - turn on the fan. Used in function/s fanM.m,
+%                       anomalies.m.
+%       fan_off       - turn off the fan. Used in function/s fanM.m,
+%                       anomalies.m.
+%       h_max         - maximum permitted humidity in the greenhouse
+%                       (regulated by humidifier). Used in function/s
+%                       humidM.m, anomalies.m.
+%       h_min         - minimum permitted humidity in the greenhouse
+%                       (regulated by humidifier). Used in function/s
+%                       humidM.m, anomalies.m.
+%       hum_on        - turn on the humidifier. Used in function/s
+%                       humidM.m, anomalies.m.
+%       hum_off       - turn off the humidifier. Used in function/s
+%                       humidM.m, anomalies.m.
+%       samp          - sampling period.
+%       door_val      - door opening position. Used in function/s doorM.m,
+%                       send_data.m.
+%       light_val     - light intensity. Used in function/s lightM.m,
+%                       anomalies.m.
+%       T_top         - temperature at the top of the greenhouse. Used in
+%                       function/s heatM.m.
+%       T_bot         - temperature at the bottom of the greenhouse. Used
+%                       in function/s heatM.m.
+%       hum_bme       - humidity measured by BME680 sensor. Used in
+%                       function/s humidM.m.
+%       hum_dht       - humidity measured by DHT11 sensor. Used in
+%                       function/s humidM.m.
+%   doorM
+%       skip          - skip current control period.
+%   lightM
+%       light_S       - control input for on/off lighting control. Used in
+%                       function/s send_data.m, anomalies.m.
+%   heatM
+%       temp_S        - control input for PID controller type temperature
+%                       control. Used in function/s send_data.m.
+%       t_val         - average value of the temperature in the greenhouse.
+%                       Used in function/s fanM.m, anomalies.m.
+%   humidM
+%       hum_S         - control input for on/off humidity control. Used in
+%                       function/s send_data.m, anomalies.m.
+%       hum_val       - average value of the humidity in the greenhouse.
+%                       Used in function/s anomalies.m.
+%   fanM
+%       fan_S         - control input for on/off ventilation control. Used
+%                       in function/s send_data.m, anomalies.m.
+%
+% !!! When interrupting the control script, it is necessary to call
+%     the function terminator.m. Turns off actuators in Vesna. This
+%     prevention of damage to the greenhouse must be done manually. !!!
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%==========================================================================
-%{
-    NAVRHY
-    - vsetky udaje sa budu musiet nacitavat z Cloudu
-        - nacitanie bude musiet byt robene v kazdom cykle
-        - App Team tam bude posielat z webstranky po prihlaseni admina
-          akcne zasahy, zmeny limitov parametrov, ziadene veliciny,
-          setpointy, konstanty PID regulatorov, casy ventilacii ...
-        - budeme musiet dorobit nove premenne na Cloude, kam App Team budu
-          zasielat svoje data
-        - cela Initialization okrem 'count','e_p','u_p'
-    - prerobit PID regulator do tvaru diskretneho riadenia
-    u(k) = (Kp + Ki*Δt + Kd/Δt) * e(k) - (Kp + 2*Kp/Δt) * e(k-1) +
-            + Kd/Δt * e(k-2) + u(k-1)
-    - vyriesit problem s casovou dlzkou riadiaceho cyklu
-        - ak je rieseny v zmysle
-            ↱ nacitaju sa data → spracuju sa data
-             caka sa 60 sekund ← poslu sa data ↲
-        - problem je iba s tou datovou castou, kedze jej casova dlzka nie
-        je rovnaka (a ak bude vacsia ako sampling period, ako sa vyriesi?)
-    - errory sa nemozu vypisovat do nekonecna
-        - okrem zasielania emailu (o ktore sa pokusi iba 5krat, potom na to
-        kasle)
-    - opýtať sa na Gmail
-    - zapisovanie časov na Cloud
-%}
-
-%{
-    STAHOVANIE VACSIEHO MNOZSTVA DAT
-
-    options = reconnect;
-    data = webread("https://api2.arduino.cc/iot/v2/things/" + ...
-        "{95e254c8-7421-4d0e-bcb6-4b6991c87b4f}/properties/" + ...
-        "{d6653286-1d51-49d0-83b9-0dd6bf6b54fe}/timeseries?" + ...
-        "from=2022-10-03T00:00:00Z&interval=300&to=2022-10-06T00:00:00Z", ...
-        options);
-    casy = datetime(cell2mat({data.data.time}'),'InputFormat', ...
-        'yyyy-MM-dd''T''HH:mm:ssxxx', 'TimeZone','Europe/Bratislava', ...
-        'Format','yyyy-MM-dd HH:mm:ss');
-    hodnoty = [data.data.value]';
-
-    interval - casovy usek medzi 2 meraniami (udavany v sekundach)
-    - maximalny pocet dat, ktore vie na jedno spustenie prikazu webread
-    stiahnut je 1000
-%}
-%==========================================================================
 
 %% Initialization
 
@@ -79,7 +133,7 @@ while(true)
 % Start script run-time
 time1 = tic;
 
-% Current time
+% Current time hour
 t_h = datetime('now').Hour;
 
 %% Load data from Arduino API Cloud

@@ -1,12 +1,30 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% reconnect
+% RECONNECT
 % 
 % File to login to Arduino Cloud Storage. M-file consists of an external
 % function that does not require input parameters. It provides
 % the 'options' parameter which contains the basic settings for MATLAB's
 % communication with the Arduino Cloud web server.
+%
+% List of used functions
+%   errors        - check the type of error that occurred. If an error
+%                   occurs, it tries to resolve it and informs the user. It
+%                   requires error 'id' and 'spec' parameters.
+%
+% List of output variables
+%   options       - settings to connect to the Arduino API Cloud.
+%
+% List of local variables
+%   id            - identifier of the error. Specifies the type of e-mail
+%                   to send about the corresponding error.
+%   spec          - specifies to send an e-mail and display the error to
+%                   the Command Window.
+%   response      - Arduino API Cloud response. It provides all
+%                   the information about the connection to the server.
+%   access_token  - access token of the Arduino API Cloud connection.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function options = reconnect
@@ -30,7 +48,7 @@ url = "https://api2.arduino.cc/iot/v1/clients/token";
             - charset - character set
         - contentType - data format
         - mediaType - type of data send to webserver
-        - timeout - 
+        - timeout - available response time of the Cloud
     - webwrite:
         - API credentials
             - url, client_id, client_secret
@@ -38,7 +56,8 @@ url = "https://api2.arduino.cc/iot/v1/clients/token";
         - audience - url to web page
         
 %}
-headerFields = {'Content-type','application/x-www-form-urlencoded';'charset','UTF-8'};
+headerFields = {'Content-type','application/x-www-form-urlencoded'; ...
+    'charset','UTF-8'};
 options = weboptions('HeaderFields', headerFields);
 
 % Initialize counter 'spec'

@@ -1,16 +1,36 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% errors
+% ERRORS
 %
-% Vesna control error detection file. M-file consists of an external
-% function that provides 'options' an output parameter. It requires
-% an input parameter 'id' which contains the identifier of the error that
-% occurred during the control. The error message is displayed in the MATLAB
-% Command Window. A notification email with a description of the error is
-% sent to the admin's email. Many errors are associated with the connection
-% to the Arduino Cloud, therefore, the connection is restored as
-% a precaution.
+% Vesna control error detection file. M-file consists of a function that
+% provides 'options' an output parameter (connection specification to
+% Arduino API Cloud). It requires an input parameter 'id' which represents
+% the identifier of the error that occurred during the control, as well as
+% 'spec' which specifies the number of function calls. The error message is
+% displayed in the MATLAB Command Window. A notification e-mail with
+% a description of the error is sent to the user's e-mail.
+%
+% List of used functions
+%   email         - check the type of error that occurred. If an error
+%                   occurs, it tries to resolve it and informs the user. It
+%                   requires 'id' parameter.
+%   reconnect     - connection to the Arduino API Cloud which ensures data
+%                   transfer between the server and the control script.
+%
+% List of input variables
+%   id            - identifier of the error. Specifies the type of e-mail
+%                   to send about the corresponding error.
+%   spec          - specifies to send an e-mail and display the error to
+%                   the Command Window.
+%
+% List of output variables
+%   options       - settings to connect to the Arduino API Cloud.
+%
+% List of local variables
+%   eType         - type of the detected error (error specification).
+%   eMessage      - description of the detected error (error message).
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function options = errors(id,spec)
@@ -58,7 +78,8 @@ eMessage = containers.Map(keySet,valueSet2);
 
 % Error display
 if ~mod(spec,5)
-    fprintf(2,strcat(eType(id),' Error (',string(datetime('now')),')\nUnable to',eMessage(id),'\n\n'))
+    fprintf(2,strcat(eType(id),' Error (',string(datetime('now')), ...
+        ')\nUnable to',eMessage(id),'\n\n'))
 end
 
 % Send mail notification troubleshooting

@@ -1,17 +1,29 @@
 
-% email 1x
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % doorM
 %
 % Vesna greenhouse door position detection file. M-file consists of
-% an external function that provides the current door position value
-% 'door_val'. It requires a series of input parameters that are used to
-% send a notification e-mail, alerting the admin of a faulty (anomalous)
-% position of the door. In this case, the control is switched to stand-by
-% mode - temperature, humidity and ventilation control are switched off,
-% lighting is switched on.
+% a function that provides the command 'skip' to turn off the control in
+% the greenhouse as an output parameter. It requires an input parameter
+% 'door_val' which numerically indicates the position of the door. If
+% the door is ajar, in such case the control is switched to stand-by mode -
+% temperature, humidity and ventilation control are switched off, light
+% stays on.
+%
+% List of used functions
+%   send_data     - send data to Arduino API Cloud - control inputs, door
+%                   position.
+%   email2        - send notification e-mail about detected opened door. It
+%                   requires email 'door' id parameter.
+%
+% List of input variables
+%   door_val      - door opening position.
+%
+% List of output variables
+%   skip          - command to turn off the Vesna regulation (activated by
+%                   the presence of an open door).
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function skip = doorM(door_val)
@@ -20,7 +32,7 @@ function skip = doorM(door_val)
 if door_val
 
     % Interrupt control loop
-    send_data(0,hum_off,fan_off,0,0,0,door_val);
+    send_data(0,0,0,0,0,0,0);
 
     % Send notification email
     try

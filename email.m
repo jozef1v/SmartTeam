@@ -1,12 +1,29 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% email
+% EMAIL
 %
-% File for sending e-mail messages. M-file consists of an external function
-% that does not provide an output parameter. It requires the input
-% parameter 'id' which contains the identifier of the error message being
-% sent.
+% File for sending error e-mail messages. M-file consists of a function
+% that does not provide an output parameter. It requires an 'id' input
+% parameter that is used to detect errors associated with Vesna control.
+%
+% List of used functions
+%   errors        - check the type of error that occurred. If an error
+%                   occurs, it tries to resolve it and informs the user. It
+%                   requires error 'id' and 'spec' parameters.
+%   sendolmail    - specifies the structure of sending an e-mail. It
+%                   requires parameters 'to' (recipient's e-mail address),
+%                   'subject' (e-mail subject), 'body' (e-mail message).
+%
+% List of input variables
+%   id            - identifier of the emerged error. Specifies the type of
+%                   e-mail to send about the corresponding error.
+%
+% List of local variables
+%   subj          - type of the detected error (e-mail subject).
+%   msg           - description of the detected error (e-mail message).
+%   destination   - recipient's e-mail address.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function email(id)
@@ -14,7 +31,7 @@ function email(id)
 %{
     Outlook credentials
     - requires:
-        - destination   - recipient's outlook email
+        - destination   - recipient's outlook e-mail
 %}
 destination = 'jozefvargan1234@outlook.com';
 
@@ -59,11 +76,12 @@ valueSet2 = {'Connection to Arduino Cloud failed - no server response. New conne
 subj = containers.Map(keySet,valueSet1);
 msg = containers.Map(keySet,valueSet2);
 
-% Send notification email
+% Send notification e-mail
 for spec = 1:5
     try
         sendolmail(destination,subj(id),msg(id));
-        fprintf(strcat('Error notification email was sent to your mail address (',string(datetime('now')),'.\n\n'))
+        fprintf(strcat('Error notification e-mail was sent to your mail address (', ...
+            string(datetime('now')),'.\n\n'))
         break
     catch
         pause(3)
@@ -77,7 +95,7 @@ end
 
 end
 
-% Create email function
+% Create e-mail function
 function sendolmail(to,subject,body)
 
 % Create object and set parameters using MS Outlook

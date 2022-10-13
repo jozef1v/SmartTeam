@@ -1,12 +1,23 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% device
+% DEVICE
 %
-% Device type assignment file. The M-file consists of an external function
-% that provides the 'ID' access key of the device being used as an output.
+% Device type assignment file. M-file consists of a function that provides
+% the 'ID' access key of the device type being used as an output parameter.
 % It requires an input parameter 'id' which contains the identifier of
-% the device in question.
+% the device type in question.
+%
+% List of input variables
+%   id            - identifier of the device type.
+%
+% List of output variables
+%   ID            - Arduino API Cloud id identificator for the type of
+%                   the used device.
+%
+% List of local variables
+%   device        - different types of used devices.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function ID = device(id)

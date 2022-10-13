@@ -1,38 +1,41 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% email2
+% EMAIL2
 %
-% File for sending e-mail messages. M-file consists of an external function
-% that does not provide an output parameter. It requires the input
-% parameter 'id' which contains the identifier of the identified anomaly
-% message being sent.
+% File for sending anomaly e-mail messages. M-file consists of a function
+% that does not provide an output parameter. It requires an 'id' input
+% parameter that is used to detect unexpected faults (anomalies) associated
+% with Vesna control.
+%
+% List of used functions
+%   errors        - check the type of error that occurred. If an error
+%                   occurs, it tries to resolve it and informs the user. It
+%                   requires error 'id' and 'spec' parameters.
+%   sendolmail    - specifies the structure of sending an e-mail. It
+%                   requires parameters 'to' (recipient's e-mail address),
+%                   'subject' (e-mail subject), 'body' (e-mail message).
+%
+% List of input variables
+%   id            - identifier of the emerged fault (anomaly). Specifies
+%                   the type of e-mail to send about the corresponding
+%                   anomaly.
+%
+% List of local variables
+%   subj          - type of the detected anomaly (e-mail subject).
+%   msg           - description of the detected anomaly (e-mail message).
+%   destination   - recipient's e-mail address.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function email2(id)
 
 %{
-    Gmail credentials
+    Outlook credentials
     - requires:
-        - source        - sender's email
-        - password      - sender's password
-        - destination   - recipient's email
+        - destination   - recipient's outlook e-mail
 %}
-source = 'Vesna.STU.2021@gmail.com';
-destination = 'dodoodod1221@gmail.com';
-password = 'Sklenik2022';
-
-% Set up Gmail SMTP
-setpref('Internet','E_mail',source);
-setpref('Internet','SMTP_Server','smtp.gmail.com');
-setpref('Internet','SMTP_Username',source);
-setpref('Internet','SMTP_Password',password);
-
-% Gmail server
-props = java.lang.System.getProperties;
-props.setProperty('mail.smtp.auth','true');
-props.setProperty('mail.smtp.socketFactory.class', 'javax.net.ssl.SSLSocketFactory');
-props.setProperty('mail.smtp.socketFactory.port','465');
+destination = 'jozefvargan1234@outlook.com';
 
 % Message description
 keySet = {'door', ...
@@ -69,13 +72,15 @@ msg = containers.Map(keySet,valueSet2);
 % Anomaly display
 fprintf(2,strcat(subj(id),' (',string(datetime('now')),')\n',msg(id),'\n\n'))
 
-% Send email
+% Send e-mail
 for spec = 1:5
     try
-        sendmail(destination,subj(id),msg(id));
-        fprintf('Anomaly notification email was sent to your mail address.\n\n')
+        sendolmail(destination,subj(id),msg(id));
+        fprintf(strcat('Anomaly notification e-mail was sent to your mail address (', ...
+            string(datetime('now')),').\n\n'))
         break
     catch
+        pause(3)
         % Terminates after 5 attempts
         if spec == 5
             errors('email',spec);
@@ -83,5 +88,22 @@ for spec = 1:5
         end
     end
 end
+
+end
+
+% Create e-mail function
+function sendolmail(to,subject,body)
+
+% Create object and set parameters using MS Outlook
+h = actxserver('outlook.Application');
+mail = h.CreateItem('olMail');
+mail.Subject = subject;
+mail.To = to;
+mail.BodyFormat = 'olFormatHTML';
+mail.HTMLBody = body;
+
+% Send message and release object
+mail.Send;
+h.release;
 
 end

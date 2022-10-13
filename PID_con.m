@@ -3,12 +3,33 @@
 %
 % PID_con
 %
-% PID_con temperature controller of the Vesna greenhouse. M-file containing
-% the external function contains the values of the current 'e' and
-% the previous 'e_p' control error, as well as the previous value of
-% the control output 'u_p' as an input argument. The output from this
-% function is the actual controlled output 'u' for the given signal
-% sampling period.
+% PID temperature controller of the Vesna greenhouse. M-file consists of
+% a function that provides a new value of control input 'u', as well as
+% previous values of control error 'e_pN' and input 'u_pN' as output
+% parameters. It requires input parameter the current 'e' and the previous
+% 'e_p' control error, as well as the previous value of the control output
+% 'u_p'.
+%
+% List of input variables
+%   e             - current sample control error.
+%   e_p           - previous sample control error.
+%   u_p           - previous sample control input.
+%
+% List of output variables
+%   u             - current sample control input.
+%   e_pN          - aktualization of the control error in previous time
+%                   sampling.
+%   u_pN          - aktualization of the control input in previous time
+%                   sampling.
+%
+% List of local variables
+%   Z_r           - proportional component (gain) of the PID controller.
+%   T_i           - integration component (time constant) of the PID
+%                   controller.
+%   T_d           - derivative component (transport delay) of the PID
+%                   controller.
+%   u_d           - control input difference.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [u,u_pN,e_pN] = PID_con(e,e_p,u_p)
@@ -25,7 +46,7 @@ function [u,u_pN,e_pN] = PID_con(e,e_p,u_p)
     % Control output saturation
     if u > 255
         u = 255;
-    elseif u < 0 
+    elseif u < 0
         u = 0;
     end
 
