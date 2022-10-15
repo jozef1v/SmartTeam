@@ -24,7 +24,11 @@
 % List of local variables
 %   subj          - type of the detected anomaly (e-mail subject).
 %   msg           - description of the detected anomaly (e-mail message).
+%   source        - sender's e-mail address.
 %   destination   - recipient's e-mail address.
+%   password      - sender's password.
+%   setpref       - set preference of Outlook SMTP.
+%   props         - set Outlook server properties.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -33,9 +37,25 @@ function email2(id)
 %{
     Outlook credentials
     - requires:
-        - destination   - recipient's outlook e-mail
+        - source        - sender's email
+        - password      - sender's password
+        - destination   - recipient's email
 %}
-destination = 'jozefvargan1234@outlook.com';
+source = 'controlvesna2022@outlook.com';
+destination = 'xvarganj@stuba.sk';
+password = '22Vcontrol';
+
+% Set up Outlook SMTP
+setpref('Internet','E_mail',source);
+setpref('Internet','SMTP_Server','smtp-mail.outlook.com');
+setpref('Internet','SMTP_Username',source);
+setpref('Internet','SMTP_Password',password);
+
+% Outlook server
+props = java.lang.System.getProperties;
+props.setProperty('mail.smtp.auth','true');
+props.setProperty('mail.smtp.starttls.enable', 'true' );
+props.setProperty('mail.smtp.socketFactory.port','587');
 
 % Message description
 keySet = {'door', ...
@@ -75,7 +95,7 @@ fprintf(2,strcat(subj(id),' (',string(datetime('now')),')\n',msg(id),'\n\n'))
 % Send e-mail
 for spec = 1:5
     try
-        sendolmail(destination,subj(id),msg(id));
+        sendmail(destination,subj(id),msg(id));
         fprintf(strcat('Anomaly notification e-mail was sent to your mail address (', ...
             string(datetime('now')),').\n\n'))
         break
@@ -88,22 +108,5 @@ for spec = 1:5
         end
     end
 end
-
-end
-
-% Create e-mail function
-function sendolmail(to,subject,body)
-
-% Create object and set parameters using MS Outlook
-h = actxserver('outlook.Application');
-mail = h.CreateItem('olMail');
-mail.Subject = subject;
-mail.To = to;
-mail.BodyFormat = 'olFormatHTML';
-mail.HTMLBody = body;
-
-% Send message and release object
-mail.Send;
-h.release;
 
 end
