@@ -26,17 +26,16 @@
 function [fan_S,countN] = fanM(T_avg,t_max,fan_on,fan_off,count)
 
 % Set fan control (on/off)
-if T_avg >= t_max
+if count >= 120
+    propertyValue = struct('value',fan_on);
+    if count >= 135
+        count = 0;
+    end
+elseif T_avg >= t_max
     propertyValue = struct('value',fan_on);
     count = 0;
 else
     propertyValue = struct('value',fan_off);
-end
-if count >= 120
-    propertyValue = struct('value',fan_on);
-    if count == 135
-        count = 0;
-    end
 end
 fan_S = propertyValue;
 
