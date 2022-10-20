@@ -53,7 +53,7 @@ light_act = light_S.value;
 %% FAN CONTROL ANOMALIES
 
 % Internal temperature of Vesna is increased, the fan does not respond.
-if T_avg >= t_max && fan_act == fan_off && count < 120
+if T_avg >= t_max && fan_act == fan_off
     anomaly_d('fan1');
 end
 
@@ -70,12 +70,12 @@ end
 %% PUMP CONTROL ANOMALIES
 
 % Internal humidity of Vesna is increased, the pump does respond.
-if HUM_avg >= h_max && hum_act == hum_on && count < 120
+if HUM_avg >= h_max && hum_act == hum_on
     anomaly_d('pump1');
 end
 
 % Internal humidity of Vesna is decreased, the pump does not respond.
-if HUM_avg <= h_min && hum_act == hum_off && count < 120
+if HUM_avg <= h_min && hum_act == hum_off
     anomaly_d('pump2');
 end
 
