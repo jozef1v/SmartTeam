@@ -31,8 +31,6 @@
 %                       using an on/off controller.
 %   send_data         - send data to Arduino API Cloud - control inputs,
 %                       door position.
-%   anomalies         - detect the emergence of an unexpected situation -
-%                       anomaly & inform the user.
 %
 % List of used variables
 %   control script
@@ -175,13 +173,6 @@ light_S = lightM(light_val,time_up,time_down,light_int,light_on, ...
 
 %% Load data to Arduino API Cloud
 send_data(light_S,hum_off,fan_off,temp_S,hum_S,fan_S,door_val);
-
-%% Control anomalies
-
-% Anomalies detection function
-anomalies(t_val,t_max,fan_S,fan_on,fan_off,count,hum_val,h_max,h_min, ...
-    hum_S,hum_on,hum_off,t_h,time_up,time_down,light_val,light_int, ...
-    light_S,light_on,light_off);
 
 %% Loop settings
 
