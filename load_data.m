@@ -67,16 +67,16 @@ light_int = 1500;       % Min. light intensity
 
 % Temperature
 t_max = 31;             % Max. admissible temperature
-w_day = 29;             % Daytime temperature setpoint
-w_night = 26.5;         % Nighttime temperature setpoint
+w_day = 25;             % Daytime temperature setpoint
+w_night = 22.5;         % Nighttime temperature setpoint
 
 % Fan
 fan_off = 0;            % Fan is on
 fan_on = 255;           % Fan is off
 
 % Humidity
-h_max = 42;             % Min. humidity
-h_min = 38;             % Max. humidity
+h_max = 52;             % Min. humidity
+h_min = 48;             % Max. humidity
 hum_off = 0;            % Pump is on
 hum_on = 255;           % Pump is off
 
