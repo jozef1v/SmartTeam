@@ -32,7 +32,7 @@ function skip = doorM(door_val)
 if door_val
 
     % Interrupt control loop
-    send_data(0,0,0,0,0,0,0);
+    send_data(0,0,0,0,0,0,1);
 
     % Send notification email
     try
