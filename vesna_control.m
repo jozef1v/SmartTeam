@@ -145,9 +145,7 @@ t_h = datetime('now').Hour;
 skip = doorM(door_val);
 
 % Skips control loop
-if skip
-    continue
-end
+if skip == 0
 
 %% Light management
 
@@ -171,9 +169,10 @@ light_S = lightM(light_val,time_up,time_down,light_int,light_on, ...
 % Fan control function
 [fan_S,count] = fanM(t_val,t_max,fan_on,fan_off,count);
 
-%% Load data to Arduino API Cloud
+%% Send data to Arduino API Cloud
 send_data(light_S,hum_off,fan_off,temp_S,hum_S,fan_S,door_val);
 
+end
 %% Loop settings
 
 % Check script run-time
