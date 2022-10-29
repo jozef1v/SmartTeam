@@ -29,11 +29,15 @@ function [fan_S,countN] = fanM(T_avg,t_max,fan_on,fan_off,count)
 if count >= 120
     propertyValue = struct('value',fan_on);
     if count >= 135
-        count = 0;
+        count = -1;
+        if T_avg >= t_max
+            propertyValue = struct('value',fan_on);
+        else
+            propertyValue = struct('value',fan_off);
+        end
     end
 elseif T_avg >= t_max
     propertyValue = struct('value',fan_on);
-    count = 0;
 else
     propertyValue = struct('value',fan_off);
 end

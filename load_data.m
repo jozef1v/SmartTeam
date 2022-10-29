@@ -67,8 +67,8 @@ light_int = 1500;       % Min. light intensity
 
 % Temperature
 t_max = 31;             % Max. admissible temperature
-w_day = 25;             % Daytime temperature setpoint
-w_night = 22.5;         % Nighttime temperature setpoint
+w_day = 22;             % Daytime temperature setpoint
+w_night = 18;           % Nighttime temperature setpoint
 
 % Fan
 fan_off = 0;            % Fan is on

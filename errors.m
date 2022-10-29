@@ -88,11 +88,11 @@ if ~strcmp(id,'email')
     % Send mail notification after each 5 unsuccessful attempts
     if ~mod(spec,5)
         email(id)
+    end
 
-        % Reconnect to Arduino API Cloud
-        if ~strcmp(id,'connect')
-            options = reconnect;
-        end
+    % Reconnect to Arduino API Cloud
+    if ~strcmp(id,'connect')
+        options = reconnect;
     end
 end
 

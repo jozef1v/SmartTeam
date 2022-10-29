@@ -40,8 +40,12 @@ while(true)
             data,options);
         break
     catch
+        pause(5)
         spec = spec + 1;
-        options = errors(error_key,spec);
+        % Terminates after 5 attempts
+        if ~mod(spec,5)
+            options = errors(error_key,spec);
+        end
         options.RequestMethod = 'put';
     end
 end

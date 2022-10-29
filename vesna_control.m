@@ -189,4 +189,12 @@ pause(samp)
 % Number of sampling periods
 count = count + 1;
 
+% Display control status
+disp("========================")
+disp(" ")
+disp("Time:")
+disp(datetime("now"))
+disp("Iteration:")
+disp(count)
+
 end

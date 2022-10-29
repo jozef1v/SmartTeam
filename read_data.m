@@ -41,8 +41,12 @@ while(true)
             device(pid),"}/properties/{",d_type(id),"}"),options);
         break
     catch
+        pause(5)
         spec = spec + 1;
-        options = errors(error_key,spec);
+        % Terminates after 5 attempts
+        if ~mod(spec,5)
+            options = errors(error_key,spec);
+        end
         options.RequestMethod = 'auto';
     end
 end

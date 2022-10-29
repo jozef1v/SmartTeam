@@ -71,6 +71,7 @@ while(true)
             'https://api2.arduino.cc/iot',options);
         break
     catch
+        pause(5)
         spec = spec + 1;
         if ~mod(spec,5)
             errors('connect',spec);

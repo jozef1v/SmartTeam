@@ -34,6 +34,10 @@
 
 function [u,u_pN,e_pN] = PID_con(e,e_p,u_p)
 
+    % Reset control error & output (e(k)->e(k-1) & u(k)->u(k-1))
+    u_pN = u_p;
+    e_pN = e_p;
+
     % Controller constants
     Z_r = 45;
     T_i = 6;
@@ -49,10 +53,6 @@ function [u,u_pN,e_pN] = PID_con(e,e_p,u_p)
     elseif u < 0
         u = 0;
     end
-
-    % Reset control error & output (e(k)->e(k-1) & u(k)->u(k-1))
-    u_pN = u;
-    e_pN = e;
 
 % u(k) = (Kp + Ki*Δt + Kd/Δt) * e(k) - (Kp + 2*Kp/Δt) * e(k-1) +
 %             + Kd/Δt * e(k-2) + u(k-1)

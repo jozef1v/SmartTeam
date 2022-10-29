@@ -35,11 +35,7 @@ if door_val
     send_data(0,0,0,0,0,0,1);
 
     % Send notification email
-    try
-        email2('door');
-    catch
-        1;
-    end
+    email('open');
 
     % Skip control loop
     skip = 1;

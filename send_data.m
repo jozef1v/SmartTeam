@@ -34,7 +34,7 @@ function send_data(light_S,hum_off,fan_off,temp_S,hum_S,fan_S,door_val)
 options = reconnect;
 
 %% Door open detection
-if door_val
+if door_val == 1
 
 % Send heating off data
 write_data('actuator','heating',struct('value',0),'heating',options);
@@ -45,8 +45,8 @@ write_data('actuator','pump',struct('value',hum_off),'pump',options);
 % Send fan off data
 write_data('actuator','fan',struct('value',fan_off),'fan',options);
 
-%% Data send to Arduino API Cloud
 else
+%% Data send to Arduino API Cloud
 
 % Send light control data
 write_data('actuator','lighting',light_S,'lighting',options);
