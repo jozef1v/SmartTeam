@@ -3,10 +3,10 @@
 %
 % RECONNECT
 % 
-% File to login to Arduino Cloud Storage. M-file consists of an external
-% function that does not require input parameters. It provides
-% the 'options' parameter which contains the basic settings for MATLAB's
-% communication with the Arduino Cloud web server.
+% File to login to Arduino Cloud Storage. M-file consists of a function
+% that does not require input parameters. It provides the 'options'
+% parameter which contains the basic settings for MATLAB's communication
+% with the Arduino Cloud web server.
 %
 % List of used functions
 %   errors        - check the type of error that occurred. If an error
@@ -29,6 +29,9 @@
 
 function options = reconnect
 
+% Load Arduino Cloud credentials
+data = credentials;
+
 %{
     Arduino Cloud credentials
     - requires:
@@ -36,8 +39,8 @@ function options = reconnect
         - client_secret - client secret (password)
         - url           - url to web sevice
 %}
-client_id = "Ij7686MXMIXCS4JyGJTe5nyQNQM6w7R9";
-client_secret = "BWbnmLopN6lUDPncNZ5zDmAYvHk81TQUbHWFACt9FwysSfqiBgQYhpkVeIYLtYDQ";
+client_id = data{1};
+client_secret = data{2};
 url = "https://api2.arduino.cc/iot/v1/clients/token";
 
 %{

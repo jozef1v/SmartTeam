@@ -1,0 +1,19 @@
+
+# Anomalies & linked files
+anomalies.m
+anomaly_D.m
+email2.m
+
+# Text files
+*.txt
+
+# Python files
+*.ipynb
+
+# PDF documents
+*.pdf
+
+# Compressed files
+*.zip
+*.rar
+

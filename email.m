@@ -32,6 +32,9 @@
 
 function email(id)
 
+% Load Outlook credentials
+data = credentials2;
+
 %{
     Outlook credentials
     - requires:
@@ -39,9 +42,9 @@ function email(id)
         - password      - sender's password
         - destination   - recipient's email
 %}
-source = 'controlvesna2022@outlook.com';
-destination = 'xvarganj@stuba.sk';
-password = '22Vcontrol';
+source = data{1};
+destination = data{2};
+password = data{3};
 
 % Set up Outlook SMTP
 setpref('Internet','E_mail',source);
