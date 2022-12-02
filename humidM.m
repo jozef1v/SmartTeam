@@ -4,11 +4,11 @@
 % humidM
 %
 % Vesna greenhouse humidity control file. M-file consists of a function
-% that provides the mean value of the humidity 'hum_val' and
-% the control input 'pump_act' as output parameters. It requires a series
-% of input parameters that are used to perform a control input of humidity
-% control. The system controller is two-position (on/off), based on the
-% minimal & maximal required humidity.
+% that provides the mean value of the humidity and the control input as
+% output parameters. It requires a series of input parameters that are used
+% to perform a control input of humidity control. The system controller is
+% two-position (on/off), based on the minimum and maximum permitted
+% humidity.
 %
 % List of input variables
 %   HUM_bme       - humidity measured by BME680 sensor.
@@ -19,25 +19,27 @@
 %   hum_off       - turn off the humidifier.
 %
 % List of output variables
+%   u             - control input.
 %   hum_val       - average value of the humidity in the greenhouse.
-%   hum_S         - control input for on/off humidity control.
+%
+% List of local variables
+%   val           - humidity control input (float type).
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [hum_val,hum_S] = humidM(HUM_bme,HUM_dht,h_max,h_min,hum_on, ...
-                                hum_off)
+function [u,hum_val] = humidM(HUM_bme,HUM_dht,h_max,h_min,hum_on,hum_off)
 
 % Average humidity
 hum_val = (HUM_bme + HUM_dht)/2;
 
-% Set humidity control (on/off)
+% Control output (on/off)
 if hum_val >= h_max
-   propertyValue = struct('value',hum_off);
+   val = hum_off;
 elseif hum_val <= h_min
-   propertyValue = struct('value',hum_on);
+   val = hum_on;
 else
-   propertyValue = struct('value',hum_off);
+   val = hum_off;
 end
-hum_S = propertyValue;
+u = struct('value',val);
 
 end
