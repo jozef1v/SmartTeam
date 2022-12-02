@@ -4,14 +4,15 @@
 % heatM
 %
 % Vesna greenhouse temperature control file. M-file consists of a function
-% that provides the value of the control input 'temp_S' and the mean value
-% of the temperature 't_val', as well as current sample control error 'e_pN'
-% and input 'u_pN' as output parameters. It requires a series of input
+% that provides the value of the control input and error in current and
+% previous sampling pariod (control error even in k-2 period) and the mean
+% value of the measured temperature. It requires a series of input
 % parameters that are used to perform a control input of temperature
 % regulation. System uses the PID type of controller.
 %
 % List of used functions
-%   PID_con       - proportional-integral-derivative type of controller.
+%   PID_con       - incremental proportional-integral-derivative type of
+%                   controller.
 %
 % List of input variables
 %   T_top         - temperature at the top of the greenhouse.
@@ -27,23 +28,20 @@
 %   t_h           - current time hour.
 %
 % List of output variables
-%   temp_S        - control input for PID controller type temperature
-%                   control.
+%   u             - current control input.
+%   e             - current control error.
+%   u_pN1         - new control input in in k-1 sampling period.
+%   e_pN1         - new control error in in k-1 sampling period.
+%   e_pN2         - new control error in in k-2 sampling period.
 %   t_val         - average value of the temperature in the greenhouse.
-%   e_pN          - aktualization of the control error in previous time
-%                   sampling.
-%   u_pN          - aktualization of the control input in previous time
-%                   sampling.
 %
 % List of local variables
 %   w             - current temperature setpoint.
-%   e             - current control error.
-%   u             - current control input.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [temp_S,t_val,u_pN,e_pN] = heatM(T_top,T_bot,time_up,time_down, ...
-                                    w_day,w_night,e_p,u_p,t_h)
+function [u,e,u_pN1,e_pN1,e_pN2,t_val] = heatM(T_top,T_bot,time_up, ...
+    time_down,w_day,w_night,e_p1,e_p2,u_p1,t_h,Z_r,T_i,T_d,T_s)
 
 % Average temperature
 t_val = (T_top + T_bot)/2;
@@ -59,7 +57,11 @@ end
 e =  w-t_val;
 
 % Control output
-[u,u_pN,e_pN] = PID_con(e,e_p,u_p);
-temp_S = struct('value',u);
+[u,u_pN1,e_pN1,e_pN2] = PID_con(e,e_p1,e_p2,u_p1,Z_r,T_i,T_d,T_s);
+u = struct('value',u);
+e = struct('value',e);
+u_pN1 = struct('value',u_pN1);
+e_pN1 = struct('value',e_pN1);
+e_pN2 = struct('value',e_pN2);
 
 end
