@@ -4,11 +4,12 @@
 % fanM
 %
 % Vesna greenhouse cooling and ventilation control file. M-file consists of
-% a function that provides the value of the control input 'fan_act' and
-% the current value of the sampling period 'countN' as output parameters.
-% It requires a series of input parameters that are used to perform
-% an control input of temperature reduction and ventilation. The system
-% controller is two-position (on/off), based on maximal .
+% a function that provides the value of the control input and the current
+% value of the sampling period as output parameters. It requires a series
+% of input parameters that are used to perform an control input of
+% temperature decrease and ventilation. The system controller is
+% two-position (on/off), based on maximum permitted temperature,
+% respectively ventilation cycle.
 %
 % List of input variables
 %   T_avg         - average value of the temperature in the greenhouse.
@@ -18,30 +19,33 @@
 %   count         - iteration cycle number.
 %
 % List of output variables
-%   fan_S         - control input for on/off ventilation control.
-%   countN        - actualization of 'count' variable.
+%   u             - control input.
+%   countN        - 'count' variable update.
+%
+% List of local variables
+%   val           - ventilation control input (float type).
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [fan_S,countN] = fanM(T_avg,t_max,fan_on,fan_off,count)
+function [u,countN] = fanM(T_avg,t_max,fan_on,fan_off,count)
 
-% Set fan control (on/off)
+% Control output (on/off)
 if count >= 120
-    propertyValue = struct('value',fan_on);
+    val = fan_on;
     if count >= 135
         count = -1;
         if T_avg >= t_max
-            propertyValue = struct('value',fan_on);
+            val = fan_on;
         else
-            propertyValue = struct('value',fan_off);
+            val = fan_off;
         end
     end
 elseif T_avg >= t_max
-    propertyValue = struct('value',fan_on);
+    val = fan_on;
 else
-    propertyValue = struct('value',fan_off);
+    val = fan_off;
 end
-fan_S = propertyValue;
+u = struct('value',val);
 
 % Rewrite count
 countN = count;
