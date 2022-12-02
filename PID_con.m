@@ -5,56 +5,47 @@
 %
 % PID temperature controller of the Vesna greenhouse. M-file consists of
 % a function that provides a new value of control input 'u', as well as
-% previous values of control error 'e_pN' and input 'u_pN' as output
-% parameters. It requires input parameter the current 'e' and the previous
-% 'e_p' control error, as well as the previous value of the control output
-% 'u_p'.
+% values of control input input and error in k-1 period (including control
+% error in k-2 period) as output parameters. It requires a series of input
+% parameters to set-up current temperature control input.
 %
 % List of input variables
-%   e             - current sample control error.
-%   e_p           - previous sample control error.
-%   u_p           - previous sample control input.
+%   e             - current control error.
+%   e_p1          - control error in in k-1 sampling period.
+%   e_p2          - control error in in k-2 sampling period.
+%   u_p1          - control input in in k-1 sampling period.
+%   Z_r           - proportional gain of the PID controller.
+%   T_i           - integral gain of the PID controller.
+%   T_d           - derivative gain of the PID controller.
+%   T_s           - sampling period (in minutes).
 %
 % List of output variables
-%   u             - current sample control input.
-%   e_pN          - aktualization of the control error in previous time
-%                   sampling.
-%   u_pN          - aktualization of the control input in previous time
-%                   sampling.
+%   u             - current control input.
+%   u_pN1         - new control input in in k-1 sampling period.
+%   e_pN1         - new control error in in k-1 sampling period.
+%   e_pN2         - new control error in in k-2 sampling period.
 %
 % List of local variables
-%   Z_r           - proportional component (gain) of the PID controller.
-%   T_i           - integration component (time constant) of the PID
-%                   controller.
-%   T_d           - derivative component (transport delay) of the PID
-%                   controller.
-%   u_d           - control input difference.
+%   u_d           - control input difference (control increase).
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [u,u_pN,e_pN] = PID_con(e,e_p,u_p)
+function [u,u_pN1,e_pN1,e_pN2] = PID_con(e,e_p1,e_p2,u_p1,Z_r,T_i,T_d,T_s)
 
-    % Reset control error & output (e(k)->e(k-1) & u(k)->u(k-1))
-    u_pN = u_p;
-    e_pN = e_p;
+% Reset control error & output
+u_pN1 = u_p1;
+e_pN2 = e_p1;
+e_pN1 = e_p;
 
-    % Controller constants
-    Z_r = 45;
-    T_i = 6;
-    T_s = 1;
+% Control output
+u_d = Z_r*(e-e_p1 + T_s/T_i*e + T_d/T_s*(e-2*e_p1+e_p2));
+u = u_p1 + u_d;
 
-    % Control output
-    u_d = Z_r*(e-e_p)+ Z_r/T_i*T_s*e;
-    u = u_p+u_d;
-
-    % Control output saturation
-    if u > 255
-        u = 255;
-    elseif u < 0
-        u = 0;
-    end
-
-% u(k) = (Kp + Ki*Δt + Kd/Δt) * e(k) - (Kp + 2*Kp/Δt) * e(k-1) +
-%             + Kd/Δt * e(k-2) + u(k-1)
+% Control output saturation
+if u > 255
+    u = 255;
+elseif u < 0
+    u = 0;
+end
 
 end
