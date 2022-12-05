@@ -1,0 +1,15 @@
+Arduino Cloud Connection Error;
+...;
+Light Error;
+Lighting Error;
+Door Error;
+Heating Error;
+Pump Error;
+Fan Error;
+Top Temperature Error;
+Bottom Temperature Error;
+BMME Humidity Error;
+DHT Humidity Error;
+Control error (in k-1 period) Error;
+Control error (in k-2 period) Error;
+Control input (in k-1 period) 

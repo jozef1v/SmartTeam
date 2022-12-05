@@ -5,99 +5,64 @@
 %
 % File for sending error e-mail messages. M-file consists of a function
 % that does not provide an output parameter. It requires an 'id' input
-% parameter that is used to detect errors associated with Vesna control.
+% parameter that is used to identify e-mail based on detection of error
+% associated with Vesna control.
 %
 % List of used functions
-%   errors        - check the type of error that occurred. If an error
-%                   occurs, it tries to resolve it and informs the user. It
-%                   requires error 'id' and 'spec' parameters.
-%   sendolmail    - specifies the structure of sending an e-mail. It
-%                   requires parameters 'to' (recipient's e-mail address),
-%                   'subject' (e-mail subject), 'body' (e-mail message).
+%   credentials2  - loads e-mail credentials.
+%   errors        - checks the type of error that occurred.
 %
 % List of input variables
-%   id            - identifier of the emerged error. Specifies the type of
-%                   e-mail to send about the corresponding error.
+%   id            - identifier of the emerged e-mail.
 %
 % List of local variables
-%   subj          - type of the detected error (e-mail subject).
+%   data          - user e-mail credentials.
+%   destin        - recipient's e-mail address.
+%   email_times   - container (dictionary) of latest sent e-mail times.
+%   fileID        - loaded file ID.
+%   keySet        - array of e-mail specifications.
 %   msg           - description of the detected error (e-mail message).
-%   source        - sender's e-mail address.
-%   destination   - recipient's e-mail address.
 %   password      - sender's password.
-%   setpref       - set preference of Outlook SMTP.
-%   props         - set Outlook server properties.
+%   source        - sender's e-mail address.
+%   subj          - type of the detected error (e-mail subject).
+%   valueSet1     - array of e-mail titles.
+%   valueSet2     - array of e-mail bodies.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function email(id)
 
-% Load Outlook credentials
+% Load Gmail credentials
 data = credentials2;
 
-%{
-    Outlook credentials
-    - requires:
-        - source        - sender's email
-        - password      - sender's password
-        - destination   - recipient's email
-%}
 source = data{1};
-destination = data{2};
+destin = data{2};
 password = data{3};
 
-% Set up Outlook SMTP
+% Set up Gmail SMTP
 setpref('Internet','E_mail',source);
-setpref('Internet','SMTP_Server','smtp-mail.outlook.com');
+setpref('Internet','SMTP_Server','smtp.gmail.com');
 setpref('Internet','SMTP_Username',source);
 setpref('Internet','SMTP_Password',password);
 
-% Outlook server
+% Gmail server
 props = java.lang.System.getProperties;
 props.setProperty('mail.smtp.auth','true');
 props.setProperty('mail.smtp.starttls.enable', 'true' );
-props.setProperty('mail.smtp.socketFactory.port','587');
+props.setProperty('mail.smtp.socketFactory.port','465');
 
 % Message description
-keySet = {'connect', ...
-          'email', ...
-          'light', ...
-          'lighting', ...
-          'door', ...
-          'heating', ...
-          'pump', ...
-          'fan', ...
-          'tempT', ...
-          'tempB', ...
-          'bmmeH', ...
-          'dhtH', ...
-          'open'};
-valueSet1 = {'Arduino Cloud Connection Error', ... 
-    '...', ...
-    'Light Error', ...
-    'Lighting Error', ...
-    'Door Error', ...
-    'Heating Error', ...
-    'Pump Error', ...
-    'Fan Error', ...
-    'Top Temperature Error', ...
-    'Bottom Temperature Error', ...
-    'BMME Humidity Error', ...
-    'DHT Humidity Error', ...
-    'Opened Door Detection'};
-valueSet2 = {'Connection to Arduino Cloud failed - no server response. New connection to the server is required.', ...
-    '...', ...
-    'Unable to load/send light intensity data from/to Cloud. Check connection, Arduino Cloud or lighting power supply.', ...
-    'Unable to load/send lighting power supply data from/to Cloud. Check connection, Arduino Cloud or lighting power supply.', ...
-    'Unable to load/send door position data from/to Cloud. Check connection, Arduino Cloud or door sensor.', ...
-    'Unable to load/send heating power supply data from/to Cloud. Check connection, Arduino Cloud or heating power supply.', ...
-    'Unable to load/send pump power supply data from/to Cloud. Check connection, Arduino Cloud or pump power supply.', ...
-    'Unable to load/send fan power supply data from/to Cloud. Check connection, Arduino Cloud or fan power supply.', ...
-    'Unable to load/send top temperature data from/to Cloud. Check connection, Arduino Cloud or temperature sensor.', ...
-    'Unable to load/send bottom temperature data from/to Cloud. Check connection, Arduino Cloud or temperature sensor.', ...
-    'Unable to load/send BMME humidity data from/to Cloud. Check connection, Arduino Cloud or BMME sensor.', ...
-    'Unable to load/send DHT humidity data from/to Cloud. Check connection, Arduino Cloud or DHT sensor.', ...
-    'Vesna greenhouse door was detected to be open. For the sake of the quality of the control, it is recommended to check and close them.'};
+fileID = fopen('emails/email_spec.txt','r');
+keySet = split(fscanf(fileID,'%s'),";");
+fclose(fileID);
+
+fileID = fopen('emails/email_title.txt','r');
+valueSet1 = split(fscanf(fileID,'%s'),";");
+fclose(fileID);
+
+fileID = fopen('emails/email_body.txt','r');
+valueSet2 = split(fscanf(fileID,'%s'),";");
+fclose(fileID);
 
 subj = containers.Map(keySet,valueSet1);
 msg = containers.Map(keySet,valueSet2);
@@ -105,12 +70,25 @@ msg = containers.Map(keySet,valueSet2);
 % Send notification e-mail
 for spec = 1:5
     try
-        sendmail(destination,subj(id),msg(id));
-        fprintf(strcat('Error notification e-mail was sent to your mail address (', ...
-            string(datetime('now')),').\n\n'))
+        % Load latest sent e-mail time
+        email_times = containers.Map(fieldnames(jsondecode(fileread("emails/email_time.json"))), ...
+        struct2cell(jsondecode(fileread("emails/email_time.json"))));
+
+        % Check period of e-mail sending & rewrite latest sent e-mail time
+        if datetime(email_times(id))+minutes(10) <= datetime('now')
+            email_times(id) = string(datetime('now'));
+            fileID = fopen("emails/email_time.json",'w');
+            fprintf(fileID,'%s',jsonencode(cell2struct(values(email_times)', ...
+                keys(email_times)'),PrettyPrint=true));
+            fclose(fileID);
+            sendmail(destin,subj(id),msg(id));
+            fprintf(strcat('Error notification e-mail was sent to your mail address (', ...
+                string(datetime('now')),').\n\n'))
+        end
         break
     catch
         pause(5)
+
         % Terminates after 5 attempts
         if spec == 5
             errors('email',spec);

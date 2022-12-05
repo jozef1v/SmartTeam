@@ -1,0 +1,15 @@
+Connection to Arduino Cloud failed - no server response. New connection to the server is required.;
+...;
+Unable to load/send light intensity data from/to Cloud. Check connection, Arduino Cloud or lighting power supply.;
+Unable to load/send lighting power supply data from/to Cloud. Check connection, Arduino Cloud or lighting power supply.;
+Unable to load/send door position data from/to Cloud. Check connection, Arduino Cloud or door sensor.;
+Unable to load/send heating power supply data from/to Cloud. Check connection, Arduino Cloud or heating power supply.;
+Unable to load/send pump power supply data from/to Cloud. Check connection, Arduino Cloud or pump power supply.;
+Unable to load/send fan power supply data from/to Cloud. Check connection, Arduino Cloud or fan power supply.;
+Unable to load/send top temperature data from/to Cloud. Check connection, Arduino Cloud or temperature sensor.;
+Unable to load/send bottom temperature data from/to Cloud. Check connection, Arduino Cloud or temperature sensor.;
+Unable to load/send BMME humidity data from/to Cloud. Check connection, Arduino Cloud or BMME sensor.;
+Unable to load/send DHT humidity data from/to Cloud. Check connection, Arduino Cloud or DHT sensor.;
+Unable to load/send control error in k-1 period from/to Cloud. Check connection or Arduino Cloud.;
+Unable to load/send control error in k-2 period from/to Cloud. Check connection or Arduino Cloud.;
+Unable to load/send control input in k-1 period from/to Cloud. Check connection or Arduino Cloud.

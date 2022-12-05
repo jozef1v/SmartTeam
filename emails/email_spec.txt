@@ -1,0 +1,15 @@
+connect;
+email;
+light;
+lighting;
+door;
+heating;
+pump;
+fan;
+tempT;
+tempB;
+bmmeH;
+dhtH;
+e_k1;
+e_k2;
+u_k1
