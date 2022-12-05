@@ -1,0 +1,9 @@
+door;
+fan1;
+fan2;
+vent;
+pump1;
+pump2;
+light1;
+light2;
+night

@@ -1,0 +1,9 @@
+Opened Door;
+Fan Control Anomaly;
+Fan Control Anomaly;
+Ventilation Anomaly;
+Pump Control Anomaly;
+Pump Control Anomaly;
+Lighting Control Anomaly;
+Lighting Control Anomaly;
+Night Mode Anomaly

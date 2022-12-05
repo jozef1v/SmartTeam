@@ -9,82 +9,60 @@
 % with Vesna control.
 %
 % List of used functions
-%   errors        - check the type of error that occurred. If an error
-%                   occurs, it tries to resolve it and informs the user. It
-%                   requires error 'id' and 'spec' parameters.
-%   sendolmail    - specifies the structure of sending an e-mail. It
-%                   requires parameters 'to' (recipient's e-mail address),
-%                   'subject' (e-mail subject), 'body' (e-mail message).
+%   credentials2  - loads e-mail credentials.
+%   errors        - checks the type of error that occurred.
 %
 % List of input variables
-%   id            - identifier of the emerged fault (anomaly). Specifies
-%                   the type of e-mail to send about the corresponding
-%                   anomaly.
+%   id            - identifier of the emerged fault (anomaly).
 %
 % List of local variables
-%   subj          - type of the detected anomaly (e-mail subject).
+%   data          - user e-mail credentials.
+%   destin        - recipient's e-mail address.
+%   email_times   - container (dictionary) of latest sent e-mail times.
+%   fileID        - loaded file ID.
+%   keySet        - array of e-mail specifications.
 %   msg           - description of the detected anomaly (e-mail message).
-%   source        - sender's e-mail address.
-%   destination   - recipient's e-mail address.
 %   password      - sender's password.
-%   setpref       - set preference of Outlook SMTP.
-%   props         - set Outlook server properties.
+%   source        - sender's e-mail address.
+%   subj          - type of the detected anomaly (e-mail subject).
+%   valueSet1     - array of e-mail titles.
+%   valueSet2     - array of e-mail bodies.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function email2(id)
 
-%{
-    Outlook credentials
-    - requires:
-        - source        - sender's email
-        - password      - sender's password
-        - destination   - recipient's email
-%}
-source = 'controlvesna2022@outlook.com';
-destination = 'xvarganj@stuba.sk';
-password = '22Vcontrol';
+% Load Gmail credentials
+data = credentials2;
 
-% Set up Outlook SMTP
+source = data{1};
+destin = data{2};
+password = data{3};
+
+% Set up Gmail SMTP
 setpref('Internet','E_mail',source);
-setpref('Internet','SMTP_Server','smtp-mail.outlook.com');
+setpref('Internet','SMTP_Server','smtp.gmail.com');
 setpref('Internet','SMTP_Username',source);
 setpref('Internet','SMTP_Password',password);
 
-% Outlook server
+% Gmail server
 props = java.lang.System.getProperties;
 props.setProperty('mail.smtp.auth','true');
 props.setProperty('mail.smtp.starttls.enable', 'true' );
-props.setProperty('mail.smtp.socketFactory.port','587');
+props.setProperty('mail.smtp.socketFactory.port','465');
 
 % Message description
-keySet = {'door', ...
-          'fan1', ...
-          'fan2', ...
-          'vent', ...
-          'pump1', ...
-          'pump2', ...
-          'light1', ...
-          'light2', ...
-          'night'};
-valueSet1 = {'Opened Door', ...
-    'Fan Control Anomaly', ...
-    'Fan Control Anomaly', ...
-    'Ventilation Anomaly', ...
-    'Pump Control Anomaly', ...
-    'Pump Control Anomaly', ...
-    'Lighting Control Anomaly', ...
-    'Lighting Control Anomaly', ...
-    'Night Mode Anomaly'};
-valueSet2 = {'Vesna door was detected as open. For the sake of the quality of the control, it is recommended to check and close them.', ...
-    'Fan control problem was detected. The temperature in Vesna is over the maximal recommended value, but the fan power supply is turned off. Check the functionality of the temperature sensor or the fan.', ...
-    'Fan control problem was detected. The temperature in Vesna is bellow the maximal recommended value, but the fan power supply is turned on. Check the functionality of the temperature sensor or the fan.', ...
-    'Failing ventilation problem was detected. During the Vesnaʼs ventilation cyclus, the fan power supply was disconnected. Check the functionality of the fan.', ...
-    'Pump control problem was detected. The humidity in Vesna is over the maximal recommended value, but the pump power supply is turned on. Check the functionality of the humidity sensor or the pump.', ...
-    'Pump control problem was detected. The humidity in Vesna is bellow the minimal recommended value, but the pump power supply is turned off. Check the functionality of the humidity sensor or the pump.', ...
-    'Lighting control problem was detected. The light intensity during the daytime lighting mode is sufficient, but the lighting is switched on. Check the functionality of the light sensor or the lighting.', ...
-    'Lighting control problem was detected. The light intensity during the daytime lighting mode is insufficient, but the lighting is switched off. Check the functionality of the light sensor or the lighting.', ...
-    'Lighting control problem was detected. The lighting in night-time mode should by turned off, but was detected to be turned on. Check the functionality of the lighting.'};
+fileID = fopen('emails2/email2_spec.txt','r');
+keySet = split(fscanf(fileID,'%s'),";");
+fclose(fileID);
+
+fileID = fopen('emails2/email2_title.txt','r');
+valueSet1 = split(fscanf(fileID,'%s'),";");
+fclose(fileID);
+
+fileID = fopen('emails2/email2_body.txt','r');
+valueSet2 = split(fscanf(fileID,'%s'),";");
+fclose(fileID);
 
 subj = containers.Map(keySet,valueSet1);
 msg = containers.Map(keySet,valueSet2);
@@ -92,15 +70,26 @@ msg = containers.Map(keySet,valueSet2);
 % Anomaly display
 fprintf(2,strcat(subj(id),' (',string(datetime('now')),')\n',msg(id),'\n\n'))
 
-% Send e-mail
+% Send anomaly detection e-mail
 for spec = 1:5
     try
-        sendmail(destination,subj(id),msg(id));
-        fprintf(strcat('Anomaly notification e-mail was sent to your mail address (', ...
-            string(datetime('now')),').\n\n'))
+        % Load latest sent e-mail time
+        email_times = containers.Map(fieldnames(jsondecode(fileread("emails2/email2_time.json"))), ...
+        struct2cell(jsondecode(fileread("emails2/email2_time.json"))));
+
+        % Check period of e-mail sending & rewrite latest sent e-mail time
+        if datetime(email_times(id))+minutes(10) <= datetime('now')
+            email_times(id) = string(datetime('now'));
+            fileID = fopen("emails2/email2_time.json",'w');
+            fprintf(fileID,'%s',jsonencode(cell2struct(values(email_times)', ...
+                keys(email_times)'),PrettyPrint=true));
+            fclose(fileID);
+            sendmail(destin,subj(id),msg(id));
+        end
         break
     catch
-        pause(3)
+        pause(5)
+
         % Terminates after 5 attempts
         if spec == 5
             errors('email',spec);

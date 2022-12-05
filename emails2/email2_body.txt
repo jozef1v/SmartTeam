@@ -1,0 +1,9 @@
+Vesna door was detected as open. For the sake of the quality of the control, it is recommended to check and close them.;
+Fan control problem was detected. The temperature in Vesna is over the maximal recommended value, but the fan power supply is turned off. Check the functionality of the temperature sensor or the fan.;
+Fan control problem was detected. The temperature in Vesna is bellow the maximal recommended value, but the fan power supply is turned on. Check the functionality of the temperature sensor or the fan.;
+Failing ventilation problem was detected. During the Vesnaʼs ventilation cyclus, the fan power supply was disconnected. Check the functionality of the fan.;
+Pump control problem was detected. The humidity in Vesna is over the maximal recommended value, but the pump power supply is turned on. Check the functionality of the humidity sensor or the pump.;
+Pump control problem was detected. The humidity in Vesna is bellow the minimal recommended value, but the pump power supply is turned off. Check the functionality of the humidity sensor or the pump.;
+Lighting control problem was detected. The light intensity during the daytime lighting mode is sufficient, but the lighting is switched on. Check the functionality of the light sensor or the lighting.;
+Lighting control problem was detected. The light intensity during the daytime lighting mode is insufficient, but the lighting is switched off. Check the functionality of the light sensor or the lighting.;
+Lighting control problem was detected. The lighting in night-time mode should by turned off, but was detected to be turned on. Check the functionality of the lighting.
