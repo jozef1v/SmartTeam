@@ -10,7 +10,7 @@
 % control.
 %
 % List of used functions
-%   anomaly_D     - send notification e-mail. It requires specific error
+%   email2        - send notification e-mail. It requires specific error
 %                   identificator.
 %   send_data     - reset control input. It requires a series of input
 %                   data, specified to prevent the detected anomaly ('n'
@@ -54,7 +54,7 @@ function anomalies(T_avg,t_max,fan_S,fan_on,fan_off,count,HUM_avg, ...
 %% HEATER CONTROL ANOMALIES
 if T_avg >= t_max && temp_S ~= 0
     send_data('n',0,'n','n','n','n','n','n')
-    anomaly_D('temp1');
+    email2('temp1');
 end
 
 %% FAN CONTROL ANOMALIES
@@ -63,21 +63,21 @@ end
 % but the fan is turned off
 if T_avg >= t_max && fan_S == fan_off
     send_data('n','n','n',fan_on,'n','n','n','n');
-    anomaly_D('fan1');
+    email2('fan1');
 end
 
 % Temperature is below maximum preferred value,
 % but the fan is turned on (not ventilation time)
 if T_avg < t_max && fan_S == fan_on && count < vent_start
     send_data('n','n','n',fan_off,'n','n','n','n');
-    anomaly_D('fan2');
+    email2('fan2');
 end
 
 % It is time to ventilate, but the fan is turned off
 if count >= vent_start && count < (vent_start+vent_duration) && ...
         fan_S == fan_off
     send_data('n','n','n',fan_on,'n','n','n','n');
-    anomaly_D('vent');
+    email2('vent');
 end
 
 %% PUMP CONTROL ANOMALIES
@@ -86,14 +86,14 @@ end
 % but the pump is turned on
 if HUM_avg >= h_max && hum_S == hum_on
     send_data('n','n',hum_off,'n','n','n','n','n');
-    anomaly_D('pump1');
+    email2('pump1');
 end
 
 % Humidity is decreased below minimum preferred value,
 % but the pump is turned off
 if HUM_avg <= h_min && hum_S == hum_off
     send_data('n','n',hum_on,'n','n','n','n','n');
-    anomaly_D('pump2');
+    email2('pump2');
 end
 
 %% LIGHTING CONTROL ANOMALIES
@@ -103,7 +103,7 @@ end
 if t_h >= time_down && t_h < time_up && light_val >= light_int && ...
         light_S == light_on
     send_data(light_off,'n','n','n','n','n','n','n');
-    anomaly_D('light1');
+    email2('light1');
 end
 
 % Light intensity is below minimum preferred value (during the daytime
@@ -111,13 +111,13 @@ end
 if t_h >= time_down && t_h < time_up && light_val < light_int && ...
         light_S == light_off
     send_data(light_on,'n','n','n','n','n','n','n');
-    anomaly_D('light2');
+    email2('light2');
 end
 
 % The lighting is turned on (during the night-time control)
 if (t_h < time_down && t_h >= time_up) && light_S == light_on
     send_data(light_off,'n','n','n','n','n','n','n');
-    anomaly_D('night');
+    email2('night');
 end
 
 %% PLANT IRRIGATION CONTROL ANOMALIES
@@ -126,14 +126,14 @@ end
 % but the irrigator is turned on
 if irr_S == 1 && soil_hum >= soil_min
     send_data('n','n','n','n','n','n','n',0);
-    anomaly_D('irrig1');
+    email2('irrig1');
 end
 
 % Soil humidity is below minimum preferred value,
 % but the irrigator is turned off
 if irr_S == 0 && soil_hum < soil_min
     send_data('n','n','n','n','n','n','n',1);
-    anomaly_D('irrig2');
+    email2('irrig2');
 end
 
 end
