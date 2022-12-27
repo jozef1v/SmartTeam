@@ -6,99 +6,109 @@
 % File for downloading data from Arduino API Cloud. M-file consists of
 % a function that provides the series of loaded data as output parameters.
 % It requires no input parameters. The loaded data include sensor measured
-% data, physical boundaries (limits) of processes, setpoints, control
-% system settigs...
+% data, physical constraints (limits) of processes, setpoints, control
+% system settigs, user settings...
 %
 % List of used functions
-%   reconnect     - connection to the Arduino API Cloud which ensures data
-%                   transfer between the server and the control script.
-%   read_data     - load and read data from Arduino API Cloud.
+%   read_data     - load and read data from Arduino API Cloud
+%   reconnect     - connects to the Arduino API Cloud
 %
 % List of output variables
-%   time_up       - time to switch off daylight lighting and switch to
-%                   night temperature control.
-%   time_down     - time to switch on daylight lighting and switch to day
-%                   temperature control.
-%   light_on      - turn on the light.
-%   light_off     - turn off the light.
-%   light_int     - minimum permitted light intensity.
-%   t_max         - maximum permitted temperature in the greenhouse
-%                   (controlled by a fan).
-%   w_day         - daytime temperature setpoint. Timed by 'time_down' &
-%                   'time_up'.
-%   w_night       - night-time temperature setpoint. Timed by 'time_up' &
-%                   'time_down'.
-%   fan_on        - turn on the fan.
-%   fan_off       - turn off the fan.
-%   h_max         - maximum permitted humidity in the greenhouse (regulated
-%                   by humidifier).
-%   h_min         - minimum permitted humidity in the greenhouse (regulated
-%                   by humidifier).
-%   hum_on        - turn on the humidifier.
-%   hum_off       - turn off the humidifier.
-%   samp          - sampling period.
-%   door_val      - door opening position.
-%   light_val     - light intensity.
-%   T_top         - temperature at the top of the greenhouse.
-%   T_bot         - temperature at the bottom of the greenhouse.
-%   hum_bme       - humidity measured by BME680 sensor.
-%   hum_dht       - humidity measured by DHT11 sensor.
+%   door_val      - door opening position
+%   fan_off       - turn off the fan
+%   fan_on        - turn on the fan
+%   h_max         - maximum preferred humidity
+%   h_min         - minimum preferred humidity
+%   hum_bme       - humidity (BME680 sensor)
+%   hum_dht       - humidity (DHT11 sensor)
+%   hum_off       - turn off the humidifier
+%   hum_on        - turn on the humidifier
+%   light_int     - minimum preferred light intensity
+%   light_off     - turn off the light
+%   light_on      - turn on the light
+%   light_val     - light intensity
+%   samp          - sampling period
+%   time_down     - daytime control start
+%   time_up       - night-time control start
+%   T_bot         - temperature (bottom of the greenhouse)
+%   t_max         - maximum preferred temperature
+%   T_top         - temperature (top of the greenhouse)
+%   w_day         - daytime temperature setpoint
+%   w_night       - night-time temperature setpoint
 %
 % List of local functions
-%   options       - settings to connect to the Arduino API Cloud.
+%   options       - settings to connect to the Arduino API Cloud
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function [time_up,time_down,light_on,light_off,light_int,t_max,w_day, ...
-          w_night,fan_on,fan_off,h_max,h_min,hum_on,hum_off,samp, ...
-          door_val,light_val,T_top,T_bot,HUM_bme,HUM_dht] = load_data
+    w_night,fan_on,fan_off,h_max,h_min,hum_on,hum_off,samp,door_val, ...
+    light_val,T_top,T_bot,HUM_bme,HUM_dht,e_k1,e_k2,t_d,t_i,u_k1, ...
+    vent_dur,vent_start,z_r,hierarchy,t_val,hum_val,fan_S,hum_S, ...
+    light_S,temp_S,irr_S,soil_hum,plant_id] = load_data
 
 % Connect to Arduino Cloud
 options = reconnect;
 
-% Daytime mode
-time_down = 6;          % Day start
-time_up = 20;           % Day end
+%% Default settings
 
-% Lighting
-light_on = 255;         % Light is on
-light_off = 0;          % Light is off
-light_int = 1500;       % Min. light intensity
+% Load default data from json file
+dataX = struct2cell(jsondecode(fileread("default.json")));
+data = ones(1e5,1)*-1;
+k = 1;
+for i = 1:length(dataX)
+    dataY = struct2cell(dataX{i});
+    for j = 1:length(dataY)
+        data(k) = dataY{j}.Value;
+        k = k + 1;
+    end
+end
+data = data(data~=-1);
 
-% Temperature
-t_max = 31;             % Max. admissible temperature
-w_day = 22;             % Daytime temperature setpoint
-w_night = 18;           % Nighttime temperature setpoint
+%% Loaded data (rewrite default settings)
 
-% Fan
-fan_off = 0;            % Fan is on
-fan_on = 255;           % Fan is off
+% Loaded data types
+pidS = {'sensor','actuator','user'};
+idS = {'e_k1','e_k2','u_k1','hierarchy','t_i','t_d','z_r','time_down', ...
+    'time_up','luminosity','light_off','light_on','temp_max','w_day', ...
+    'w_night','fan_off','fan_on','hum_max','hum_min','hum_off','hum_on', ...
+    'plant_id','sampling','vent_duration','vent_start','fan','pump', ...
+    'lighting','heating','irrigator','door','light','bmmeH','dhtH', ...
+    'tempT','tempB','soilH'};
 
-% Humidity
-h_max = 52;             % Min. humidity
-h_min = 48;             % Max. humidity
-hum_off = 0;            % Pump is on
-hum_on = 255;           % Pump is off
+% Extract data values
+for i = 1:length(idS)
+    if i > length(idS)-7
+        data(i) = read_data(pidS{1},idS{i},idS{i},options);
+    elseif i > length(idS)-12
+        data(i) = read_data(pidS{2},idS{i},idS{i},options);
+    else
+        data(i) = read_data(pidS{3},idS{i},idS{i},options);
+    end
+end
 
-% Sampling period time
-samp = 60;
+% Assign data values to variables
+data = num2cell(data);
+[e_k1,e_k2,u_k1,hierarchy,t_i,t_d,z_r,time_down,time_up,light_int, ...
+ light_off,light_on,t_max,w_day,w_night,fan_off,fan_on,h_max,h_min, ...
+ hum_off,hum_on,plant_id,samp,vent_dur,vent_start,fan_S,hum_S,light_S, ...
+ temp_S,irr_S,door_val,light_val,HUM_bme,HUM_dht,T_top,T_bot, ...
+ soil_hum] = deal(data{:});
 
-% Load door position data
-door_val = read_data('sensor','door','door',options);
+% Update data (if admin loads them from a file)
+if plant_id ~= 0
+    [t_max,w_day,w_night,h_min,h_max,time_up] = plant_set(plant_id, ...
+        time_down);
+end
 
-% Load light intensity value
-light_val = read_data('sensor','light','light',options);
+% Adjust time data
+time_down = time_down/3600;
+time_up = time_up/3600;
+vent_dur = vent_dur/60;
+vent_start = vent_start/60;
 
-% Load top temperature data
-T_top = read_data('sensor','tempT','tempT',options);
-
-% Load bottom temperature data
-T_bot = read_data('sensor','tempB','tempB',options);
-
-% Load BMME humidity data
-HUM_bme = read_data('sensor','bmmeH','bmmeH',options);
-
-% Load DHT humidity data
-HUM_dht = read_data('sensor','dhtH','dhtH',options);
+% Average temperature, humidity
+t_val = (T_top + T_bot)/2;
+hum_val = (HUM_bme + HUM_dht)/2;
 
 end
