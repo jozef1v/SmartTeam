@@ -6,7 +6,8 @@
 % File for sending error e-mail messages. M-file consists of a function
 % that does not provide any output parameter. It requires the ID input
 % parameter that is used to identify e-mail based on detection of error
-% associated with Vesna control.
+% associated with Vesna control. Email message is displayed in the MATLAB
+% Command Window.
 %
 % List of used functions
 %   credentials2  - loads e-mail credentials
