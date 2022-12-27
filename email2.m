@@ -4,29 +4,30 @@
 % EMAIL2
 %
 % File for sending anomaly e-mail messages. M-file consists of a function
-% that does not provide an output parameter. It requires an 'id' input
-% parameter that is used to detect unexpected faults (anomalies) associated
-% with Vesna control.
+% that does not provide any output parameter. It requires the ID input
+% parameter that is used to detect unexpected control behaviour (anomalies)
+% associated with Vesna control.
 %
 % List of used functions
-%   credentials2  - loads e-mail credentials.
-%   errors        - checks the type of error that occurred.
+%   credentials2  - loads e-mail credentials
+%   errors        - checks the type of error that occurred
 %
 % List of input variables
-%   id            - identifier of the emerged fault (anomaly).
+%   id            - identifier of the emerged e-mail
 %
 % List of local variables
-%   data          - user e-mail credentials.
-%   destin        - recipient's e-mail address.
-%   email_times   - container (dictionary) of latest sent e-mail times.
-%   fileID        - loaded file ID.
-%   keySet        - array of e-mail specifications.
-%   msg           - description of the detected anomaly (e-mail message).
-%   password      - sender's password.
-%   source        - sender's e-mail address.
-%   subj          - type of the detected anomaly (e-mail subject).
-%   valueSet1     - array of e-mail titles.
-%   valueSet2     - array of e-mail bodies.
+%   data          - user e-mail credentials
+%   destin        - recipient's e-mail address
+%   email_times   - container of latest sent e-mail times
+%   fileID        - loaded file ID
+%   keySet        - array of e-mail specifications
+%   msg           - description of the detected anomaly (e-mail message)
+%   password      - sender's password
+%   source        - sender's e-mail address
+%   spec          - e-mail send attempts
+%   subj          - type of the detected anomaly (e-mail subject)
+%   valueSet1     - array of e-mail titles
+%   valueSet2     - array of e-mail bodies
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -39,7 +40,7 @@ source = data{1};
 destin = data{2};
 password = data{3};
 
-% Set up Gmail SMTP
+% Set Gmail SMTP
 setpref('Internet','E_mail',source);
 setpref('Internet','SMTP_Server','smtp.gmail.com');
 setpref('Internet','SMTP_Username',source);
@@ -51,17 +52,19 @@ props.setProperty('mail.smtp.auth','true');
 props.setProperty('mail.smtp.starttls.enable', 'true' );
 props.setProperty('mail.smtp.socketFactory.port','465');
 
-% Message description
+% Message specifications
 fileID = fopen('emails2/email2_spec.txt','r');
 keySet = split(fscanf(fileID,'%s'),";");
 fclose(fileID);
 
+% Message titles
 fileID = fopen('emails2/email2_title.txt','r');
-valueSet1 = split(fscanf(fileID,'%s'),";");
+valueSet1 = strrep(split(fscanf(fileID,'%s'),";"),'_',' ');
 fclose(fileID);
 
+% Message bodies
 fileID = fopen('emails2/email2_body.txt','r');
-valueSet2 = split(fscanf(fileID,'%s'),";");
+valueSet2 = strrep(split(fscanf(fileID,'%s'),";"),'_',' ');
 fclose(fileID);
 
 subj = containers.Map(keySet,valueSet1);
