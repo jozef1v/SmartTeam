@@ -4,60 +4,75 @@
 % SEND_DATA
 %
 % File for sending processed data to Arduino API Cloud. M-file consists of
-% a function that does not provide an output parameter. It requires a
-% series of input parameters which contain of the control inputs of
-% actuators in the greenhouse.
+% a function that does not provide any output parameter. It requires a
+% series of input parameters which contain the control inputs of actuators
+% in Vesna greenhouse.
 %
 % List of used functions
-%   reconnect     - connection to the Arduino API Cloud which ensures data
-%                   transfer between the server and the control script.
-%   write_data    - write data to the Arduino API Cloud.
+%   reconnect     - connection to the Arduino API Cloud
+%   write_data    - write data to the Arduino API Cloud
 %
 % List of input variables
-%   light_S       - control input for on/off lighting control.
-%   hum_on        - turn on the humidifier.
-%   hum_off       - turn off the humidifier.
-%   temp_S        - control input for PID controller type temperature
-%                   control.
-%   hum_S         - control input for on/off humidity control.
-%   fan_S         - control input for on/off ventilation control.
-%   door_val      - door opening position.
+%   door_val      - door opening position
+%   e_k1          - control error in k-1 period
+%   e_k2          - control error in k-2 period
+%   fan_S         - fan control input
+%   hum_off       - turn off the humidifier
+%   hum_on        - turn on the humidifier
+%   hum_S         - humidity control input
+%   irr_S         - irrigation control input
+%   light_S       - lighting control input
+%   temp_S        - temperature control input
+%   u_k1          - control input in k-1 period
 %
 % List of local variables
-%   options       - settings to connect to the Arduino API Cloud.
+%   options       - settings to connect to the Arduino API Cloud
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function send_data(light_S,hum_off,fan_off,temp_S,hum_S,fan_S,door_val)
+function send_data(light_S,temp_S,hum_S,fan_S,e_k1,e_k2,u_k1,irr_S)
 
 % Connect to Arduino Cloud
 options = reconnect;
 
-%% Door open detection
-if door_val == 1
-
-% Send heating off data
-write_data('actuator','heating',struct('value',0),'heating',options);
-
-% Send pump off data
-write_data('actuator','pump',struct('value',hum_off),'pump',options);
-
-% Send fan off data
-write_data('actuator','fan',struct('value',fan_off),'fan',options);
-
-else
-%% Data send to Arduino API Cloud
-
 % Send light control data
-write_data('actuator','lighting',light_S,'lighting',options);
+if light_S ~= 'n'
+    write_data('actuator','lighting',light_S,'lighting',options);
+end
 
 % Send heating control data
-write_data('actuator','heating',temp_S,'heating',options);
+if temp_S ~= 'n'
+    write_data('actuator','heating',temp_S,'heating',options);
+end
 
 % Send pump control data
-write_data('actuator','pump',hum_S,'pump',options);
+if hum_S ~= 'n'
+    write_data('actuator','pump',hum_S,'pump',options);
+end
 
 % Send fan control data
-write_data('actuator','fan',fan_S,'fan',options);
+if fan_S ~= 'n'
+    write_data('actuator','fan',fan_S,'fan',options);
+end
+
+% Send control error in k-1 period
+if e_k1 ~= 'n'
+    write_data('user','e_k1',e_k1,'e_k1',options);
+end
+
+% Send control error in k-2 period
+if e_k2 ~= 'n'
+    write_data('user','e_k2',e_k2,'e_k2',options);
+end
+
+% Send control input in k-1 period
+if u_k1 ~= 'n'
+    write_data('user','u_k1',u_k1,'u_k1',options);
+end
+
+% Send irrigation control data
+if irr_S ~= 'n'
+    write_data('actuator','irrigator',irr_S,'irrigator',options);
+end
 
 end
