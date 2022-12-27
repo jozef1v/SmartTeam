@@ -70,6 +70,9 @@ fclose(fileID);
 subj = containers.Map(keySet,valueSet1);
 msg = containers.Map(keySet,valueSet2);
 
+% Error display
+fprintf(2,strcat(subj(id),' (',string(datetime('now')),')\n',msg(id),'\n\n'))
+
 % Send notification e-mail
 for spec = 1:5
     try
