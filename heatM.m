@@ -15,23 +15,23 @@
 %                   controller
 %
 % List of input variables
-%   e_p           - temperature control error in k-1 period
+%   e_p           - temperature control error in k period
 %   T_bot         - temperature (bottom of the greenhouse)
 %   t_h           - current time hour
 %   time_down     - daytime control start
 %   time_up       - night-time control start
 %   T_top         - temperature (top of the greenhouse)
-%   u_p           - temperature control input in k-1 period
+%   u_p           - temperature control input in k period
 %   w_day         - daytime temperature setpoint
 %   w_night       - night-time temperature setpoint
 %
 % List of output variables
 %   e             - temperature control error in k period
-%   e_pN1         - update temperature control error in in k-1 period
-%   e_pN2         - update temperature control error in in k-2 period
-%   t_val         - average value of the temperature in the greenhouse
+%   e_pN1         - update temperature control error in k-1 period
+%   e_pN2         - update temperature control error in k-2 period
+%   t_val         - mean temperature
 %   u             - temperature control input in k period
-%   u_pN1         - update temperature control input in in k-1 period
+%   u_pN1         - update temperature control input in k-1 period
 %
 % List of local variables
 %   w             - temperature setpoint in k period
