@@ -3,65 +3,58 @@
 %
 % heatM
 %
-% Vesna greenhouse temperature control file. M-file consists of a function
+% File for heating of the Vesna greenhouse. M-file consists of a function
 % that provides the value of the control input and error in current and
-% previous sampling pariod (control error even in k-2 period) and the mean
+% previous sampling pariod (and control error in k-2 period) and the mean
 % value of the measured temperature. It requires a series of input
 % parameters that are used to perform a control input of temperature
 % regulation. System uses the PID type of controller.
 %
 % List of used functions
 %   PID_con       - incremental proportional-integral-derivative type of
-%                   controller.
+%                   controller
 %
 % List of input variables
-%   T_top         - temperature at the top of the greenhouse.
-%   T_bot         - temperature at the bottom of the greenhouse.
-%   time_up       - time to switch off daylight lighting and switch to
-%                   night temperature control.
-%   time_down     - time to switch on daylight lighting and switch to
-%                   day temperature control.
-%   w_day         - daytime temperature setpoint.
-%   w_night       - night-time temperature setpoint.
-%   e_p           - control error in previous time sampling.
-%   u_p           - control input in previous time sampling.
-%   t_h           - current time hour.
+%   e_p           - temperature control error in k-1 period
+%   T_bot         - temperature (bottom of the greenhouse)
+%   t_h           - current time hour
+%   time_down     - daytime control start
+%   time_up       - night-time control start
+%   T_top         - temperature (top of the greenhouse)
+%   u_p           - temperature control input in k-1 period
+%   w_day         - daytime temperature setpoint
+%   w_night       - night-time temperature setpoint
 %
 % List of output variables
-%   u             - current control input.
-%   e             - current control error.
-%   u_pN1         - new control input in in k-1 sampling period.
-%   e_pN1         - new control error in in k-1 sampling period.
-%   e_pN2         - new control error in in k-2 sampling period.
-%   t_val         - average value of the temperature in the greenhouse.
+%   e             - temperature control error in k period
+%   e_pN1         - update temperature control error in in k-1 period
+%   e_pN2         - update temperature control error in in k-2 period
+%   t_val         - average value of the temperature in the greenhouse
+%   u             - temperature control input in k period
+%   u_pN1         - update temperature control input in in k-1 period
 %
 % List of local variables
-%   w             - current temperature setpoint.
+%   w             - temperature setpoint in k period
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [u,e,u_pN1,e_pN1,e_pN2,t_val] = heatM(T_top,T_bot,time_up, ...
-    time_down,w_day,w_night,e_p1,e_p2,u_p1,t_h,Z_r,T_i,T_d,T_s)
+function [u,e,u_pN1,e_pN1,e_pN2,t_val] = heatM(T_top,T_bot,time_up,time_down, ...
+    w_day,w_night,e_p1,e_p2,u_p1,t_h,Z_r,T_i,T_d,T_s)
 
-% Average temperature
+% Mean temperature
 t_val = (T_top + T_bot)/2;
 
 % Temperature setpoint
 if t_h >= time_down && t_h < time_up
     w = w_day;
-else 
+else
     w = w_night;
 end
 
-% Control error
-e =  w-t_val;
+% Temperature control error
+e = w-t_val;
 
-% Control output
+% Temperature control input
 [u,u_pN1,e_pN1,e_pN2] = PID_con(e,e_p1,e_p2,u_p1,Z_r,T_i,T_d,T_s);
-u = struct('value',u);
-e = struct('value',e);
-u_pN1 = struct('value',u_pN1);
-e_pN1 = struct('value',e_pN1);
-e_pN2 = struct('value',e_pN2);
 
 end
