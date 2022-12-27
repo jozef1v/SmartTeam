@@ -7,7 +7,7 @@
 % that provides the value of the control input and error in current and
 % previous sampling pariod (and control error in k-2 period) and the mean
 % value of the measured temperature. It requires a series of input
-% parameters that are used to perform a control input of temperature
+% parameters that are used to set a control input of temperature
 % regulation. System uses the PID type of controller.
 %
 % List of used functions

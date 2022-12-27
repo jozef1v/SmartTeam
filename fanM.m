@@ -8,7 +8,7 @@
 % the current value of the sampling period as output parameters. It
 % requires a series of input parameters that are used to set an control
 % input for fan. The system controller is two-position (on/off), based on
-% maximum permitted temperature, respectively ventilation cycle.
+% maximum preferred temperature, respectively ventilation cycle.
 %
 % List of input variables
 %   count         - Vesna control iteration period
