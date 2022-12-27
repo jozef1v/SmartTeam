@@ -1,11 +1,9 @@
 
-# Anomalies & linked files
-anomalies.m
-anomaly_D.m
-email2.m
-
-# Text files
-*.txt
+# Specified files
+credentials.txt
+credentials2.txt
+identifiers/id_value.txt
+identifiers/pid_value.txt
 
 # Python files
 *.ipynb
@@ -17,3 +15,5 @@ email2.m
 *.zip
 *.rar
 
+# MATLAB autosave files
+*.asv
