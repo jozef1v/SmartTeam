@@ -3,33 +3,40 @@
 %
 % DEVICE
 %
-% Device type assignment file. M-file consists of a function that provides
-% the 'ID' access key of the device type being used as an output parameter.
-% It requires an input parameter 'id' which contains the identifier of
-% the device type in question.
+% File for assigning the ID of the type of device in use. M-file consists
+% of a function that provides the ID access key of the requested device
+% type as an output parameter. It requires an input ID specifier parameter
+% which represents the identifier of the device type in question.
 %
 % List of input variables
-%   id            - identifier of the device type.
+%   id            - identifier of the demanded device type
 %
 % List of output variables
-%   ID            - Arduino API Cloud id identificator for the type of
-%                   the used device.
+%   ID            - Arduino API Cloud ID identificator for the type of
+%                   the demanded device
 %
 % List of local variables
-%   device        - different types of used devices.
+%   device        - container of IDs of available device types
+%   fileID        - loaded file ID
+%   keySet        - ID specs
+%   valueSet      - ID values
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function ID = device(id)
     
-% Devices ID
-keySet = {'sensor','actuator'};
-valueSet = {'95e254c8-7421-4d0e-bcb6-4b6991c87b4f'; % Sensors
-        'aa0190a8-9312-4a17-8842-25a1dd483860'};    % Actuators
-% valueSet = {'2c7b8052-e8bf-4d4f-9391-dee629d6faa5'; % Sensors
-%         'acf3535f-083b-43a5-bd1c-9bae4f2f6d97'};    % Actuators
-device = containers.Map(keySet,valueSet);
+% ID specifications
+fileID = fopen('identifiers/id_spec.txt','r');
+keySet = split(fscanf(fileID,'%s'),";");
+fclose(fileID);
 
+% ID values
+fileID = fopen('identifiers/id_value.txt','r');
+valueSet = split(fscanf(fileID,'%s'),";");
+fclose(fileID);
+
+% Assign ID
+device = containers.Map(keySet,valueSet);
 ID = device(id);
 
 end
