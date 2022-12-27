@@ -11,17 +11,17 @@
 % maximum permitted temperature, respectively ventilation cycle.
 %
 % List of input variables
+%   count         - Vesna control iteration period
+%   fan_off       - turn off the fan
+%   fan_on        - turn on the fan
 %   T_avg         - temperature mean value
 %   t_max         - maximum preferred temperature
-%   fan_on        - turn on the fan
-%   fan_off       - turn off the fan
-%   count         - Vesna control iteration period
 %   vent_duration - ventilation duration
 %   vent_start    - ventilation period 
 %
 % List of output variables
-%   u             - fan control input
 %   countN        - 'count' variable update
+%   u             - fan control input
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
