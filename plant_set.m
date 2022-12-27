@@ -13,12 +13,12 @@
 %   time_down     - daytime control start
 %
 % List of output variables
-%   t_max         - maximum preferred temperature
-%   w_day         - daytime temperature setpoint
-%   w_night       - night-time temperature setpoint
 %   hum_max       - maximum preferred humidity
 %   hum_min       - minimum preferred humidity
 %   time_up       - night-time control start
+%   t_max         - maximum preferred temperature
+%   w_day         - daytime temperature setpoint
+%   w_night       - night-time temperature setpoint
 %
 % List of local functions
 %   data          - loaded JSON plant data
