@@ -4,27 +4,25 @@
 % READ_DATA
 %
 % File for reading data from Arduino API Cloud. M-file consists of
-% a function that provides data 'data_val' to be loaded from server. It
+% a function that provides data to be loaded from cloud server. It
 % requires a series of input parameters which contain identifiers and
-% credentials to load required data from the server.
+% credentials to load required data from the cloud server.
 %
 % List of used functions
-%   errors        - check the type of error that occurred. If an error
-%                   occurs, it tries to resolve it and informs the user. It
-%                   requires error 'error_key' and 'spec' parameters.
+%   errors        - checks the type of error that occurred
 %
 % List of input variables
-%   pid           - identifier of the used device.
-%   id            - identifier of the device type.
-%   error_key     - identifier of the error that occurred.
-%   options       - settings to connect to the Arduino API Cloud.
+%   error_key     - identifier of the error type
+%   id            - identifier of the demanded device type
+%   options       - settings to connect to the Arduino API Cloud
+%   pid           - identifier of the demanded device
 %
 % List of output variables
-%   data_val      - loaded data from Arduino API Cloud.
+%   data_val      - loaded data value from Arduino API Cloud
 %
 % List of local variables
-%   spec          - specifies to send an e-mail and display the error to
-%                   the Command Window.
+%   data          - loaded data from Arduino API Cloud
+%   spec          - e-mail send attempts
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -43,6 +41,7 @@ while(true)
     catch
         pause(5)
         spec = spec + 1;
+        
         % Terminates after 5 attempts
         if ~mod(spec,5)
             options = errors(error_key,spec);
