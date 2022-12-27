@@ -18,7 +18,7 @@
 % List of local variables
 %   fileID        - loaded file PID
 %   keySet        - PID specs
-%   type_d        - container of PIDs of available devices.
+%   type_d        - container of PIDs of available devices
 %   valueSet      - PID values
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -35,7 +35,7 @@ fileID = fopen('identifiers/pid_value.txt','r');
 valueSet = split(fscanf(fileID,'%s'),";");
 fclose(fileID);
 
-% Assign PIDs
+% Assign PID
 type_d = containers.Map(keySet,valueSet);
 PID = type_d(pid);
 
