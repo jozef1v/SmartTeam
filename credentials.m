@@ -3,27 +3,19 @@
 %
 % CREDENTIALS
 % 
-% File to load Arduino Cloud connection credentials (from external file
-% credentials.txt). M-file consists of a function that does not require
-% input parameters. It provides the 'data' parameter which contains the
-% basic Arduino Cloud connection credentials.
+% File to load Arduino API Cloud connection credentials (from external file
+% credentials.txt). M-file consists of a function that does not require any
+% input parameters. It provides credentials parameter which contains
+% Arduino API Cloud connection credentials.
 %
 % List of output variables
-%   data          - credentials to connect to the Arduino API Cloud (id &
-%                   secret).
+%   data          - Arduino API Cloud connection credentials (id & secret)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function data = credentials
 
-% Load set-up
-DELIMITER = ' ';
-HEADERLINES = 4;
-
-% Load data
-dataR = importdata("credentials.txt", DELIMITER, HEADERLINES);
-[~,name] = fileparts("credentials.txt");
-dataM.(matlab.lang.makeValidName(name)) = dataR;
-data = {dataM.credentials{2};dataM.credentials{4}};
+data = importdata("credentials.txt");
+data = {data{2};data{4}};
 
 end
