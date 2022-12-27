@@ -3,51 +3,49 @@
 %
 % fanM
 %
-% Vesna greenhouse cooling and ventilation control file. M-file consists of
-% a function that provides the value of the control input and the current
-% value of the sampling period as output parameters. It requires a series
-% of input parameters that are used to perform an control input of
-% temperature decrease and ventilation. The system controller is
-% two-position (on/off), based on maximum permitted temperature,
-% respectively ventilation cycle.
+% File for cooling and ventilation of the Vesna greenhouse. M-file consists
+% of a function that provides the value of the control input and
+% the current value of the sampling period as output parameters. It
+% requires a series of input parameters that are used to set an control
+% input for fan. The system controller is two-position (on/off), based on
+% maximum permitted temperature, respectively ventilation cycle.
 %
 % List of input variables
-%   T_avg         - average value of the temperature in the greenhouse.
-%   t_max         - maximum permitted temperature in the greenhouse.
-%   fan_on        - turn on the fan.
-%   fan_off       - turn off the fan.
-%   count         - iteration cycle number.
+%   T_avg         - temperature mean value
+%   t_max         - maximum preferred temperature
+%   fan_on        - turn on the fan
+%   fan_off       - turn off the fan
+%   count         - Vesna control iteration period
+%   vent_duration - ventilation duration
+%   vent_start    - ventilation period 
 %
 % List of output variables
-%   u             - control input.
-%   countN        - 'count' variable update.
-%
-% List of local variables
-%   val           - ventilation control input (float type).
+%   u             - fan control input
+%   countN        - 'count' variable update
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [u,countN] = fanM(T_avg,t_max,fan_on,fan_off,count)
+function [u,countN] = fanM(T_avg,t_max,fan_on,fan_off,count,vent_start, ...
+    vent_dur)
 
-% Control output (on/off)
-if count >= 120
-    val = fan_on;
-    if count >= 135
+% Fan control input
+if count >= vent_start
+    u = fan_on;
+    if count >= (vent_dur+vent_start)
         count = -1;
         if T_avg >= t_max
-            val = fan_on;
+            u = fan_on;
         else
-            val = fan_off;
+            u = fan_off;
         end
     end
 elseif T_avg >= t_max
-    val = fan_on;
+    u = fan_on;
 else
-    val = fan_off;
+    u = fan_off;
 end
-u = struct('value',val);
 
-% Rewrite count
+% Update 'count'
 countN = count;
 
 end
