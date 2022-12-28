@@ -15,26 +15,44 @@
 %
 % List of output variables
 %   door_val      - door opening position
+%   e_k1          - control error in k-1 period
+%   e_k2          - control error in k-2 period
 %   fan_off       - turn off the fan
 %   fan_on        - turn on the fan
+%   fan_S         - fan control input
+%   hierarchy     - login permission access
 %   h_max         - maximum preferred humidity
 %   h_min         - minimum preferred humidity
 %   hum_bme       - humidity (BME680 sensor)
 %   hum_dht       - humidity (DHT11 sensor)
 %   hum_off       - turn off the humidifier
 %   hum_on        - turn on the humidifier
+%   hum_S         - humidity control input
+%   hum_val       - mean humidity
+%   irr_S         - irrigation control input
 %   light_int     - minimum preferred light intensity
 %   light_off     - turn off the light
 %   light_on      - turn on the light
+%   light_S       - lighting control input
 %   light_val     - light intensity
+%   plant_id      - plant ID
 %   samp          - sampling period
+%   soil_hum      - soil humidity
 %   time_down     - daytime control start
 %   time_up       - night-time control start
 %   T_bot         - temperature (bottom of the greenhouse)
+%   t_d           - derivative gain
+%   temp_S        - temperature control input
+%   t_i           - integral gain
 %   t_max         - maximum preferred temperature
 %   T_top         - temperature (top of the greenhouse)
+%   t_val         - mean temperature
+%   u_k1          - control input in k-1 period
+%   vent_dur      - ventilation duration
+%   vent_start    - ventilation period
 %   w_day         - daytime temperature setpoint
 %   w_night       - night-time temperature setpoint
+%   z_r           - proportional gain
 %
 % List of local functions
 %   options       - settings to connect to the Arduino API Cloud
@@ -47,7 +65,7 @@ function [time_up,time_down,light_on,light_off,light_int,t_max,w_day, ...
     vent_dur,vent_start,z_r,hierarchy,t_val,hum_val,fan_S,hum_S, ...
     light_S,temp_S,irr_S,soil_hum,plant_id] = load_data
 
-% Connect to Arduino Cloud
+% Connect to Arduino API Cloud
 options = reconnect;
 
 %% Default settings

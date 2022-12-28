@@ -10,17 +10,14 @@
 % control.
 %
 % List of used functions
-%   email2        - send notification e-mail. It requires specific error
-%                   identificator.
-%   send_data     - reset control input. It requires a series of input
-%                   data, specified to prevent the detected anomaly ('n'
-%                   stands for 'not used').
+%   email2        - sends notification e-mail
+%   send_data     - sends control data to Arduino API Cloud
 %
 % List of input variables
 %   count         - Vesna control iteration period
 %   fan_off       - turn off the fan
 %   fan_on        - turn on the fan
-%   fan_S         - ventilation control input
+%   fan_S         - fan control input
 %   HUM_avg       - humidity mean value
 %   h_max         - maximum preferred humidity
 %   h_min         - minimum preferred humidity

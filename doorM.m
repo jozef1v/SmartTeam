@@ -12,9 +12,8 @@
 % to zero, light is not affected.
 %
 % List of used functions
-%   send_data     - send interrupt control data to Arduino API Cloud
-%   email2        - send notification e-mail. It requires 'door' error
-%                   identificator
+%   send_data     - sends interrupt control data to Arduino API Cloud
+%   email2        - sends notification e-mail
 %
 % List of input variables
 %   door_val      - door opening position
