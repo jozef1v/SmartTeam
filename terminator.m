@@ -6,23 +6,21 @@
 % File for turning off control of Vesna. M-file does not require any input
 % or output parameters. It terminates the control cycle and turns off all
 % actuators in the greenhouse. This MUST be called after inturrapting
-% 'vesna_control' to prevent the undesirable behaviour and damage of the
-% system device.
+% main Vesna control file to prevent the undesirable behaviour and damage
+% of the system device.
 %
 % List of used functions
-%   reconnect     - connection to the Arduino API Cloud which ensures data
-%                   transfer between the server and the control script.
-%   write_data    - write data to the Arduino API Cloud. All values are set
-%                   to zero.
+%   reconnect     - connects to the Arduino API Cloud
+%   write_data    - write data to the Arduino API Cloud
 %
 % List of local variables
-%   options       - settings to connect to the Arduino API Cloud.
+%   options       - settings to connect to the Arduino API Cloud
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function terminator
 
-% Connect to Arduino Cloud
+% Connect to Arduino API Cloud
 options = reconnect;
 
 % Send heating off data
@@ -36,6 +34,9 @@ write_data('actuator','fan',struct('value',0),'fan',options);
 
 % Send light off data
 write_data('actuator','lighting',struct('value',0),'lighting',options);
+
+% Send irrigation off data
+write_data('actuator','irrigator',struct('value',0),'irrigator',options);
 
 imshow('terminator.jpg')
 
