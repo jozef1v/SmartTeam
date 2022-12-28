@@ -6,4 +6,7 @@ pump1;
 pump2;
 light1;
 light2;
-night
+night;
+temp1;
+irrig1;
+irrig2
