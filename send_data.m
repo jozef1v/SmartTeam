@@ -6,19 +6,18 @@
 % File for sending processed data to Arduino API Cloud. M-file consists of
 % a function that does not provide any output parameter. It requires a
 % series of input parameters which contain the control inputs of actuators
-% in Vesna greenhouse.
+% in Vesna greenhouse, including door position based on neural network
+% detection.
 %
 % List of used functions
 %   reconnect     - connection to the Arduino API Cloud
 %   write_data    - write data to the Arduino API Cloud
 %
 % List of input variables
-%   door_val      - door opening position
+%   doorNN        - door opening position - neural network data
 %   e_k1          - control error in k-1 period
 %   e_k2          - control error in k-2 period
 %   fan_S         - fan control input
-%   hum_off       - turn off the humidifier
-%   hum_on        - turn on the humidifier
 %   hum_S         - humidity control input
 %   irr_S         - irrigation control input
 %   light_S       - lighting control input
@@ -30,7 +29,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function send_data(light_S,temp_S,hum_S,fan_S,e_k1,e_k2,u_k1,irr_S)
+function send_data(light_S,temp_S,hum_S,fan_S,e_k1,e_k2,u_k1,irr_S,doorNN)
 
 % Connect to Arduino Cloud
 options = reconnect;
@@ -73,6 +72,11 @@ end
 % Send irrigation control data
 if irr_S ~= 'n'
     write_data('actuator','irrigator',irr_S,'irrigator',options);
+end
+
+% Send neural network control data
+if irr_S ~= 'n'
+    write_data('sensor','doorNN',doorNN,'doorNN',options);
 end
 
 end

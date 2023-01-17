@@ -3,6 +3,7 @@ Arduino_Cloud_Connection_Error;
 Light_Error;
 Lighting_Error;
 Door_Error;
+Neural_Network_Door_Error;
 Heating_Error;
 Pump_Error;
 Fan_Error;

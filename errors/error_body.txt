@@ -3,6 +3,7 @@
 )\nUnable_to_load/send_light_intensity_data_from/to_Cloud.;
 )\nUnable_to_load/send_lighting_power_supply_from/to_Cloud.;
 )\nUnable_to_load/send_door_position_data_from/to_Cloud.;
+)\nUnable_to_load/send_door_position_data_based_on_neural_network_detection_from/to_Cloud.;
 )\nUnable_to_load/send_heating_power_supply_from/to_Cloud.;
 )\nUnable_to_load/send_pump_power_supply_from/to_Cloud.;
 )\nUnable_to_load/send_fan_power_supply_from/to_Cloud.;

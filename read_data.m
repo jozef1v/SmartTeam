@@ -35,8 +35,14 @@ options.RequestMethod = 'auto';
 % Load last data value
 while(true)
     try
-        data = webread(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
-            device(pid),"}/properties/{",d_type(id),"}"),options);
+        if id(1) == '_'
+            data = webread(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
+                device(pid),"}/properties/{",d_type(id(2:end)), ...
+                "}/timeseries?desc=true&interval=3"),options);
+        else
+            data = webread(strcat("https://api2.arduino.cc/iot/v2/things/{", ...
+                device(pid),"}/properties/{",d_type(id),"}"),options);
+        end
         break
     catch
         pause(5)
@@ -49,6 +55,10 @@ while(true)
         options.RequestMethod = 'auto';
     end
 end
-data_val = data.last_value;
+if id(1) == '_'
+    data_val = data;
+else
+    data_val = data.last_value;
+end
 
 end

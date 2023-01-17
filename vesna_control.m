@@ -10,11 +10,15 @@
 %
 % Variables control in the code is decentralized. Each controlled variable
 % (temperature, humidity, lighting, soil humidity), including door position
-% detection and greenhouse ventilation, is based on external functions,
-% creating individual control sections of Vesna. They download (measured)
-% data from the Arduino API Cloud, where the values of control output are
-% subsequently sent. In the event of a malfunction, the user is informed by
-% e-mail, while programm tries to solve the emerged problem.
+% detection based on neural network model and greenhouse ventilation, is
+% based on external functions, creating individual control sections of
+% Vesna. They download (measured) data from the Arduino API Cloud, where
+% the values of control output are subsequently sent. In the event of
+% a malfunction, the user is informed by e-mail, while programm tries to
+% solve the emerged problem. A summary e-mail at the end of the day will
+% provide the user with an overview of contrl settings during the day.
+% Another option is to change the control from automatic to manual, when
+% the user controls the measured quantities himself.
 %
 % List of used functions
 %   anomalies         - detects unexpected control behaviour (anomalies)
@@ -36,6 +40,7 @@
 % List of used variables
 %   count             - Vesna control iteration period
 %   door_val          - door opening position
+%   doorNN            - door opening position - neural network data
 %   e                 - control error in k period
 %   e_k1              - control error in k-1 period
 %   e_k2              - control error in k-2 period
@@ -104,14 +109,14 @@ t_h = datetime('now').Hour;
     fan_on,fan_off,h_max,h_min,hum_on,hum_off,samp,door_val,light_val, ...
     T_top,T_bot,HUM_bme,HUM_dht,e_k1,e_k2,t_d,t_i,u_k1,vent_dur, ...
     vent_start,z_r,hierarchy,t_val,hum_val,fan_S,hum_S,light_S,temp_S, ...
-    irr_S,soil_hum,plant_id] = load_data;
+    irr_S,soil_hum,plant_id,doorNN] = load_data;
 
 %% Detect anomalies
 
 anomalies(t_val,t_max,fan_S,fan_on,fan_off,count,hum_val,h_max,h_min, ...
     hum_S,hum_on,hum_off,t_h,time_up,time_down,light_val,light_int, ...
     light_S,light_on,light_off,temp_S,irr_S,soil_hum,vent_start, ...
-    vent_duration,soil_min)
+    vent_dur,soil_min)
 
 %% Automatic/manual greenhouse control
 
@@ -120,7 +125,7 @@ if hierarchy == 0
 %% Door management
 
 % Door position control function
-skip = doorM(door_val);
+[skip,doorNN] = doorM(door_val);
 
 % Skips control loop
 if skip == 0
@@ -156,7 +161,7 @@ end
 end
 
 %% Send data to Arduino API Cloud
-send_data(light_S,temp_S,hum_S,fan_S,e_k1,e_k2,u_k1,irr_S);
+send_data(light_S,temp_S,hum_S,fan_S,e_k1,e_k2,u_k1,irr_S,doorNN);
 
 % Send day data summary (once a day)
 if time_up <= t_h

@@ -12,10 +12,12 @@
 % to zero, light is not affected.
 %
 % List of used functions
-%   send_data     - sends interrupt control data to Arduino API Cloud
 %   email2        - sends notification e-mail
+%   nn_load       - neural network to detect door position
+%   send_data     - sends interrupt control data to Arduino API Cloud
 %
 % List of input variables
+%   doorNN        - door opening position - neural network data
 %   door_val      - door opening position
 %
 % List of output variables
@@ -23,13 +25,13 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function skip = doorM(door_val)
+function [skip,doorNN] = doorM(door_val)
 
 % Door control setup
 if door_val == 1
 
     % Interrupt control loop
-    send_data('n',0,0,0,'n','n','n',0);
+    send_data('n',0,0,0,'n','n','n',0,'n');
     email2('door');
 
     % Skip control loop
@@ -41,5 +43,8 @@ else
     skip = 0;
 
 end
+
+% Neural network - door position
+doorNN = nn_load;
 
 end

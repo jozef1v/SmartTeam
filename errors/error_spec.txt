@@ -3,6 +3,7 @@ email;
 light;
 lighting;
 door;
+doorNN;
 heating;
 pump;
 fan;
